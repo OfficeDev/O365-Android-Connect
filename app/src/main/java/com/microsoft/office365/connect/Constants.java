@@ -9,8 +9,8 @@ interface Constants {
     public static final String DISCOVERY_RESOURCE_ID = "https://api.office.com/discovery/";
     public static final String MAIL_CAPABILITY = "Mail";
     // Update these two constants with the values for your application:
-    public static final String CLIENT_ID = "7c6bb398-09fc-4a68-bac5-2d0d7bfe65e8";
-    public static final String REDIRECT_URI = "https://www.patsoltest.com";
+    public static final String CLIENT_ID = "<Your client id here>";
+    public static final String REDIRECT_URI = "<Your redirect URI here>";
 }
 
 // *********************************************************
