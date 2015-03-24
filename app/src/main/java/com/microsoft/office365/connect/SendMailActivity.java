@@ -25,6 +25,7 @@ import com.google.common.util.concurrent.SettableFuture;
 import com.microsoft.discoveryservices.ServiceInfo;
 
 import java.text.MessageFormat;
+import java.util.concurrent.ExecutionException;
 
 /**
  * This activity handles the send mail operation of the app.
@@ -91,31 +92,23 @@ public class SendMailActivity extends ActionBarActivity {
                                         serviceInfo.getserviceEndpointUri()
                                 );
 
-                        final ListenableFuture<Boolean> mailSent = MailController
-                                .getInstance()
-                                .sendMail(
-                                        mEmailEditText.getText().toString(),
-                                        getResources().getString(R.string.mail_subject_text),
-                                        MessageFormat.format(
-                                                getResources().getString(R.string.mail_body_text),
-                                                getIntent().getStringExtra("givenName")
-                                        )
-                                );
-                        Futures.addCallback(
-                                mailSent, new FutureCallback<Boolean>() {
-                                    @Override
-                                    public void onSuccess(Boolean result) {
-                                        Log.i(TAG, "sendMailToRecipient - Mail sent");
-                                        showSendMailSuccessUI();
-                                    }
-
-                                    @Override
-                                    public void onFailure(Throwable t) {
-                                        Log.e(TAG, "onSendMailButtonClick - " + t.getMessage());
-                                        showSendMailErrorUI();
-                                    }
-                                }
-                        );
+                        try{
+                            // Since we are no longer on the UI thread,
+                            // we can call this method synchronously without blocking the UI
+                            Boolean mailSent = MailController.getInstance().sendMail(
+                                    mEmailEditText.getText().toString(),
+                                    getResources().getString(R.string.mail_subject_text),
+                                    MessageFormat.format(
+                                            getResources().getString(R.string.mail_body_text),
+                                            getIntent().getStringExtra("givenName")
+                                    )
+                            ).get();
+                            Log.i(TAG, "sendMailToRecipient - Mail sent");
+                            showSendMailSuccessUI();
+                        } catch (InterruptedException | ExecutionException e){
+                            Log.e(TAG, "onSendMailButtonClick - " + e.getMessage());
+                            showSendMailErrorUI();
+                        }
                     }
 
                     @Override
