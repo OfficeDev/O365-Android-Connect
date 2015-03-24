@@ -16,7 +16,6 @@
         <activity
             android:name=".ConnectActivity"
             android:label="@string/app_name"
-            android:configChanges="orientation|screenSize"
             android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,7 +26,6 @@
         <activity
             android:name=".SendMailActivity"
             android:label="@string/app_name"
-            android:configChanges="orientation|screenSize"
             android:screenOrientation="portrait"
             android:parentActivityName="com.microsoft.office365.connect.ConnectActivity" >
             <meta-data
