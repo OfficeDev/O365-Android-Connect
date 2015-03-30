@@ -4,6 +4,7 @@
 package com.microsoft.office365.connect;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -137,10 +138,11 @@ public class SendMailActivity extends ActionBarActivity {
         AuthenticationController.resetInstance();
 
         //Clear cookies.
-        CookieSyncManager syncManager = CookieSyncManager.createInstance(this);
-        if (syncManager != null) {
-            CookieManager cookieManager = CookieManager.getInstance();
-            cookieManager.removeAllCookie();
+        if(Build.VERSION.SDK_INT >= 21){
+            CookieManager.getInstance().removeSessionCookies(null);
+            CookieManager.getInstance().flush();
+        }else{
+            CookieManager.getInstance().removeSessionCookie();
             CookieSyncManager.getInstance().sync();
         }
 
