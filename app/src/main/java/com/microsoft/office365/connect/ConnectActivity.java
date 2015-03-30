@@ -57,13 +57,12 @@ public class ConnectActivity extends ActionBarActivity {
         initializeViews();
 
         // Devices with API level lower than 18 must setup an encryption key.
-        try {
-            if (Build.VERSION.SDK_INT < 18) {
+        if(Build.VERSION.SDK_INT < 18) {
+            try {
                 setupEncryptionKey();
+            } catch (NoSuchAlgorithmException | InvalidKeySpecException | UnsupportedEncodingException ex) {
+                showEncryptionKeyErrorUI();
             }
-        }
-        catch(NoSuchAlgorithmException|InvalidKeySpecException|UnsupportedEncodingException ex){
-            showEncryptionKeyErrorUI();
         }
 
         // We're not using Microsoft Intune's Company portal app,
