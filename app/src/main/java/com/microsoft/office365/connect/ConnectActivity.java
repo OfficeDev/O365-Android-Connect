@@ -1,7 +1,5 @@
 /*
- * Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See full license at the bottom of this file.
- * Portions of this class are adapted from the LoginFragment.java file from Microsoft Open Technologies, Inc.
- * located at https://github.com/AzureAD/azure-activedirectory-library-for-android/blob/2f6e922199a42b477cc77e52c4621641d41ae8ed/samples/hello/src/com/microsoft/aad/adal/hello/LoginFragment.java
+ *  Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See full license at the bottom of this file.
  */
 package com.microsoft.office365.connect;
 
