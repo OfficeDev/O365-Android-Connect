@@ -20,16 +20,9 @@ import com.google.common.util.concurrent.SettableFuture;
 import com.microsoft.aad.adal.AuthenticationResult;
 import com.microsoft.aad.adal.AuthenticationSettings;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
+import java.security.SecureRandom;
 import java.util.UUID;
-
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.SecretKeySpec;
 
 /**
  * Starting activity of the app. Handles the connection to Office 365.
@@ -55,16 +48,16 @@ public class ConnectActivity extends ActionBarActivity {
         initializeViews();
 
         // Devices with API level lower than 18 must setup an encryption key.
-        if(Build.VERSION.SDK_INT < 18) {
-            try {
-                setupEncryptionKey();
-            } catch (NoSuchAlgorithmException | InvalidKeySpecException | UnsupportedEncodingException ex) {
-                showEncryptionKeyErrorUI();
-            }
+        if (Build.VERSION.SDK_INT < 18 && AuthenticationSettings.INSTANCE.getSecretKeyData() == null) {
+                AuthenticationSettings.INSTANCE.setSecretKey(generateSecretKey());
         }
 
         // We're not using Microsoft Intune's Company portal app,
-        // skip the broker check.
+        // skip the broker check so we don't get warnings about the following permissions
+        // in manifest:
+        // GET_ACCOUNTS
+        // USE_CREDENTIALS
+        // MANAGE_ACCOUNTS
         AuthenticationSettings.INSTANCE.setSkipBroker(true);
     }
 
@@ -76,13 +69,11 @@ public class ConnectActivity extends ActionBarActivity {
         showConnectingInProgressUI();
 
         //check that client id and redirect have been set correctly
-        try
-        {
+        try {
             UUID.fromString(Constants.CLIENT_ID);
             URI.create(Constants.REDIRECT_URI);
         }
-        catch (IllegalArgumentException e)
-        {
+        catch (IllegalArgumentException e) {
             Toast.makeText(
                     this
                     , getString(R.string.warning_clientid_redirecturi_incorrect)
@@ -121,6 +112,7 @@ public class ConnectActivity extends ActionBarActivity {
 
                 resetUIForConnect();
             }
+
             @Override
             public void onFailure(final Throwable t) {
                 Log.e(TAG, "onCreate - " + t.getMessage());
@@ -149,23 +141,13 @@ public class ConnectActivity extends ActionBarActivity {
     }
 
     /**
-     * Sets up an encryption key for devices with API level lower than 18. It uses the
-     * PBEWithSHA256And256BitAES-CBC-BC algorithm.
-     * It generates a secret key based on a password and salt.
-     * @throws NoSuchAlgorithmException
-     * @throws InvalidKeySpecException
-     * @throws UnsupportedEncodingException
+     * Randomly generates an encryption key for devices with API level lower than 18.
+     * @return The encryption key in a 32 byte long array.
      */
-    public void setupEncryptionKey() throws NoSuchAlgorithmException,
-            InvalidKeySpecException, UnsupportedEncodingException {
-        if (AuthenticationSettings.INSTANCE.getSecretKeyData() == null) {
-            SecretKeyFactory keyFactory = SecretKeyFactory
-                    .getInstance("PBEWithSHA256And256BitAES-CBC-BC");
-            SecretKey tempKey = keyFactory.generateSecret(new PBEKeySpec("O365_password".toCharArray(),
-                    "O365_salt".getBytes("UTF-8"), 100, 256));
-            SecretKey secretKey = new SecretKeySpec(tempKey.getEncoded(), "AES");
-            AuthenticationSettings.INSTANCE.setSecretKey(secretKey.getEncoded());
-        }
+    protected byte[] generateSecretKey() {
+        byte[] key = new byte[32];
+        new SecureRandom().nextBytes(key);
+        return key;
     }
 
     private void initializeViews(){
