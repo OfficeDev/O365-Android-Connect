@@ -21,6 +21,7 @@ import com.google.common.util.concurrent.SettableFuture;
 import com.microsoft.aad.adal.AuthenticationResult;
 import com.microsoft.aad.adal.AuthenticationSettings;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.UUID;
 
@@ -148,9 +149,16 @@ public class ConnectActivity extends ActionBarActivity {
      * successfully.
      * @return The encryption key in a 32 byte long array.
      */
-    protected byte[] generateSecretKey() {
+    private byte[] generateSecretKey() {
         byte[] key = new byte[32];
-        byte[] android_id = Settings.Secure.ANDROID_ID.getBytes();
+        byte[] android_id = null;
+
+        try{
+            android_id = Settings.Secure.ANDROID_ID.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e){
+            Log.e(TAG, "generateSecretKey - " + e.getMessage());
+            showEncryptionKeyErrorUI();
+        }
 
         for(int i = 0; i < key.length; i++){
             key[i] = android_id[i % android_id.length];
