@@ -6,6 +6,7 @@ package com.microsoft.office365.connect;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
@@ -20,8 +21,8 @@ import com.google.common.util.concurrent.SettableFuture;
 import com.microsoft.aad.adal.AuthenticationResult;
 import com.microsoft.aad.adal.AuthenticationSettings;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.security.SecureRandom;
 import java.util.UUID;
 
 /**
@@ -141,12 +142,28 @@ public class ConnectActivity extends ActionBarActivity {
     }
 
     /**
-     * Randomly generates an encryption key for devices with API level lower than 18.
+     * Generates an encryption key for devices with API level lower than 18 using the
+     * ANDROID_ID value as a seed.
+     * In production scenarios, you should come up with your own implementation of this method.
+     * Consider that your algorithm must return the same key so it can encrypt/decrypt values
+     * successfully.
      * @return The encryption key in a 32 byte long array.
      */
-    protected byte[] generateSecretKey() {
+    private byte[] generateSecretKey() {
         byte[] key = new byte[32];
-        new SecureRandom().nextBytes(key);
+        byte[] android_id = null;
+
+        try{
+            android_id = Settings.Secure.ANDROID_ID.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e){
+            Log.e(TAG, "generateSecretKey - " + e.getMessage());
+            showEncryptionKeyErrorUI();
+        }
+
+        for(int i = 0; i < key.length; i++){
+            key[i] = android_id[i % android_id.length];
+        }
+
         return key;
     }
 
