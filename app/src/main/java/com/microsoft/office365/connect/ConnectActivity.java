@@ -48,7 +48,7 @@ public class ConnectActivity extends ActionBarActivity {
         initializeViews();
 
         // Devices with API level lower than 18 must setup an encryption key.
-        if (Build.VERSION.SDK_INT < 18 && AuthenticationSettings.INSTANCE.getSecretKeyData() == null) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2 && AuthenticationSettings.INSTANCE.getSecretKeyData() == null) {
                 AuthenticationSettings.INSTANCE.setSecretKey(generateSecretKey());
         }
 
