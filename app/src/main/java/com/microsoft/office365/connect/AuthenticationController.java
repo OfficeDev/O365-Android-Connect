@@ -6,7 +6,10 @@
 package com.microsoft.office365.connect;
 
 import android.app.Activity;
+import android.os.Build;
 import android.util.Log;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 
 import com.google.common.util.concurrent.SettableFuture;
 import com.microsoft.aad.adal.AuthenticationCallback;
@@ -164,5 +167,30 @@ public class AuthenticationController {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Disconnects the app from Office 365 by clearing the token cache, setting the client objects
+     * to null, and clearing the app cookies from the device.
+     */
+    public void disconnect(){
+        //Clear tokens.
+        if(getAuthenticationContext().getCache() != null) {
+            getAuthenticationContext().getCache().removeAll();
+        }
+
+        //Reset controller objects.
+        MailController.resetInstance();
+        DiscoveryController.resetInstance();
+        AuthenticationController.resetInstance();
+
+        //Clear cookies.
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            CookieManager.getInstance().removeSessionCookies(null);
+            CookieManager.getInstance().flush();
+        }else{
+            CookieManager.getInstance().removeSessionCookie();
+            CookieSyncManager.getInstance().sync();
+        }
     }
 }
