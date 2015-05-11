@@ -119,6 +119,10 @@ public class AuthenticationController {
                                         resourceId,
                                         Constants.CLIENT_ID);
                                 result.set(authenticationResult);
+                            } else if (authenticationResult != null){
+                                // This condition can happen if user signs in with an MSA account
+                                // instead of an Office 365 account
+                                result.setException(new Throwable(authenticationResult.getErrorDescription()));
                             }
                         }
 
