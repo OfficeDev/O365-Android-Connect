@@ -93,7 +93,7 @@ public class SendMailActivity extends ActionBarActivity {
                                         serviceInfo.getserviceEndpointUri()
                                 );
 
-                        try{
+                        try {
                             // Since we are no longer on the UI thread,
                             // we can call this method synchronously without blocking the UI
                             Boolean mailSent = MailController.getInstance().sendMail(
@@ -106,7 +106,7 @@ public class SendMailActivity extends ActionBarActivity {
                             ).get();
                             Log.i(TAG, "sendMailToRecipient - Mail sent");
                             showSendMailSuccessUI();
-                        } catch (InterruptedException | ExecutionException e){
+                        } catch (InterruptedException | ExecutionException e) {
                             Log.e(TAG, "onSendMailButtonClick - " + e.getMessage());
                             showSendMailErrorUI();
                         }
@@ -118,35 +118,6 @@ public class SendMailActivity extends ActionBarActivity {
                         showDiscoverErrorUI();
                     }
                 });
-    }
-
-    /**
-     * Disconnects the app from Office 365 by clearing the token cache, setting the client objects
-     * to null, and clearing the app cookies from the device.
-     */
-    private void disconnect(){
-        //Clear tokens.
-        AuthenticationController
-                .getInstance()
-                .getAuthenticationContext()
-                .getCache()
-                .removeAll();
-
-        //Reset controller objects.
-        MailController.resetInstance();
-        DiscoveryController.resetInstance();
-        AuthenticationController.resetInstance();
-
-        //Clear cookies.
-        if(Build.VERSION.SDK_INT >= 21){
-            CookieManager.getInstance().removeSessionCookies(null);
-            CookieManager.getInstance().flush();
-        }else{
-            CookieManager.getInstance().removeSessionCookie();
-            CookieSyncManager.getInstance().sync();
-        }
-
-        showDisconnectSuccessUI();
     }
 
     @Override
@@ -161,7 +132,8 @@ public class SendMailActivity extends ActionBarActivity {
         try {
             switch (item.getItemId()) {
                 case R.id.disconnectMenuitem:
-                    disconnect();
+                    AuthenticationController.getInstance().disconnect();
+                    showDisconnectSuccessUI();
                     Intent connectIntent = new Intent(this, ConnectActivity.class);
                     startActivity(connectIntent);
                     return true;

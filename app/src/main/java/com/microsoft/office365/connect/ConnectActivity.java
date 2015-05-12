@@ -117,6 +117,8 @@ public class ConnectActivity extends ActionBarActivity {
             @Override
             public void onFailure(final Throwable t) {
                 Log.e(TAG, "onCreate - " + t.getMessage());
+                // We need to make sure that there are no cookies stored with the failed auth
+                AuthenticationController.getInstance().disconnect();
                 showConnectErrorUI();
             }
         });
