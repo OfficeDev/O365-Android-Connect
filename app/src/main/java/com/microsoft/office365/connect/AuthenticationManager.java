@@ -29,10 +29,10 @@ import com.microsoft.services.odata.interfaces.LogLevel;
 public class AuthenticationManager {
     private static String TAG = "AuthenticationManager";
 
-    private AuthenticationContext authContext;
-    private ADALDependencyResolver dependencyResolver;
-    private Activity contextActivity;
-    private String resourceId;
+    private AuthenticationContext mAuthenticationContext;
+    private ADALDependencyResolver mDependencyResolver;
+    private Activity mContextActivity;
+    private String mResourceId;
 
     public static synchronized AuthenticationManager getInstance() {
         if (INSTANCE == null) {
@@ -48,22 +48,17 @@ public class AuthenticationManager {
     private static AuthenticationManager INSTANCE;
 
     private AuthenticationManager() {
-        resourceId = Constants.DISCOVERY_RESOURCE_ID;
-    }
-
-    private AuthenticationManager(final Activity contextActivity){
-        this();
-        this.contextActivity = contextActivity;
+        mResourceId = Constants.DISCOVERY_RESOURCE_ID;
     }
 
     /**
-     * Set the context activity before initializing to the currently active activity.
+     * Set the context activity before connecting to the currently active activity.
      *
      * @param contextActivity Currently active activity which can be utilized for interactive
      *                        prompt.
      */
     public void setContextActivity(final Activity contextActivity) {
-        this.contextActivity = contextActivity;
+        this.mContextActivity = contextActivity;
     }
 
     /**
@@ -73,8 +68,8 @@ public class AuthenticationManager {
      * @param resourceId URL of resource ID to be accessed on behalf of user.
      */
     public void setResourceId(final String resourceId) {
-        this.resourceId = resourceId;
-        this.dependencyResolver.setResourceId(resourceId);
+        this.mResourceId = resourceId;
+        this.mDependencyResolver.setResourceId(resourceId);
     }
 
     /**
@@ -82,30 +77,30 @@ public class AuthenticationManager {
      * @param level LogLevel to set.
      */
     public void enableLogging(LogLevel level) {
-        this.dependencyResolver.getLogger().setEnabled(true);
-        this.dependencyResolver.getLogger().setLogLevel(level);
+        this.mDependencyResolver.getLogger().setEnabled(true);
+        this.mDependencyResolver.getLogger().setLogLevel(level);
     }
 
     /**
      * Turn logging off.
      */
     public void disableLogging() {
-        this.dependencyResolver.getLogger().setEnabled(false);
+        this.mDependencyResolver.getLogger().setEnabled(false);
     }
 
     /**
-     * Description: Calls AuthenticationContext.acquireToken(...) once to initialize with
+     * Description: Calls AuthenticationContext.acquireToken(...) once to connect with
      * user's credentials and avoid interactive prompt on later calls.
-     * If all tokens expire, app must call initialize() again to prompt user interactively and
+     * If all tokens expire, app must call connect() again to prompt user interactively and
      * set up authentication context.
      *
      * @return A signal to wait on before continuing execution.
      */
-    public void initialize(final AuthenticationCallback authenticationCallback) {
+    public void connect(final AuthenticationCallback authenticationCallback) {
         if (verifyAuthenticationContext()) {
             getAuthenticationContext().acquireToken(
-                    this.contextActivity,
-                    this.resourceId,
+                    this.mContextActivity,
+                    this.mResourceId,
                     Constants.CLIENT_ID,
                     Constants.REDIRECT_URI,
                     PromptBehavior.Auto,
@@ -114,9 +109,9 @@ public class AuthenticationManager {
                         public void onSuccess(final AuthenticationResult authenticationResult) {
 
                             if (authenticationResult != null && authenticationResult.getStatus() == AuthenticationStatus.Succeeded) {
-                                dependencyResolver = new ADALDependencyResolver(
+                                mDependencyResolver = new ADALDependencyResolver(
                                         getAuthenticationContext(),
-                                        resourceId,
+                                        mResourceId,
                                         Constants.CLIENT_ID);
                                 authenticationCallback.onSuccess(authenticationResult);
                             } else if (authenticationResult != null){
@@ -137,7 +132,7 @@ public class AuthenticationManager {
                     }
             );
         } else {
-            Log.e(TAG, "initialize - Auth context verification failed. Did you set a context activity?");
+            Log.e(TAG, "connect - Auth context verification failed. Did you set a context activity?");
             AuthenticationException ae = new AuthenticationException(
                     ADALError.ACTIVITY_REQUEST_INTENT_DATA_IS_NULL,
                     "Auth context verification failed. Did you set a context activity?");
@@ -151,22 +146,22 @@ public class AuthenticationManager {
      * @return authenticationContext, if successful
      */
     public AuthenticationContext getAuthenticationContext() {
-        if (authContext == null) {
+        if (mAuthenticationContext == null) {
             try {
-                authContext = new AuthenticationContext(this.contextActivity, Constants.AUTHORITY_URL, false);
+                mAuthenticationContext = new AuthenticationContext(this.mContextActivity, Constants.AUTHORITY_URL, false);
             } catch (Throwable t) {
                 Log.e(TAG, t.toString());
             }
         }
-        return authContext;
+        return mAuthenticationContext;
     }
 
     public DependencyResolver getDependencyResolver() {
-        return getInstance().dependencyResolver;
+        return getInstance().mDependencyResolver;
     }
 
     private boolean verifyAuthenticationContext() {
-        if (this.contextActivity == null) {
+        if (this.mContextActivity == null) {
             Log.e(TAG,"Must set context activity");
             return false;
         }

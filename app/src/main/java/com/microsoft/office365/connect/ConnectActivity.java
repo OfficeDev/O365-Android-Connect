@@ -89,7 +89,7 @@ public class ConnectActivity extends ActionBarActivity {
         final Intent sendMailIntent = new Intent(this, SendMailActivity.class);
 
         AuthenticationManager.getInstance().setContextActivity(this);
-        AuthenticationManager.getInstance().initialize(
+        AuthenticationManager.getInstance().connect(
                 new AuthenticationCallback<AuthenticationResult>() {
                     /**
                      * If the connection is successful, the activity extracts the username and
