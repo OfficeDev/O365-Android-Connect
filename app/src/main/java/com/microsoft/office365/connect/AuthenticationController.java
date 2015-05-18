@@ -12,8 +12,10 @@ import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 
 import com.google.common.util.concurrent.SettableFuture;
+import com.microsoft.aad.adal.ADALError;
 import com.microsoft.aad.adal.AuthenticationCallback;
 import com.microsoft.aad.adal.AuthenticationContext;
+import com.microsoft.aad.adal.AuthenticationException;
 import com.microsoft.aad.adal.AuthenticationResult;
 import com.microsoft.aad.adal.AuthenticationResult.AuthenticationStatus;
 import com.microsoft.aad.adal.PromptBehavior;
@@ -77,7 +79,7 @@ public class AuthenticationController {
     }
 
     /**
-     * Turn on logging.
+     * Turn logging on.
      * @param level LogLevel to set.
      */
     public void enableLogging(LogLevel level) {
@@ -86,7 +88,7 @@ public class AuthenticationController {
     }
 
     /**
-     * Turn off logging.
+     * Turn logging off.
      */
     public void disableLogging() {
         this.dependencyResolver.getLogger().setEnabled(false);
@@ -100,10 +102,7 @@ public class AuthenticationController {
      *
      * @return A signal to wait on before continuing execution.
      */
-    public SettableFuture<AuthenticationResult> initialize() {
-
-        final SettableFuture<AuthenticationResult> result = SettableFuture.create();
-
+    public void initialize(final AuthenticationCallback authenticationCallback) {
         if (verifyAuthenticationContext()) {
             getAuthenticationContext().acquireToken(
                     this.contextActivity,
@@ -112,7 +111,6 @@ public class AuthenticationController {
                     Constants.REDIRECT_URI,
                     PromptBehavior.Auto,
                     new AuthenticationCallback<AuthenticationResult>() {
-
                         @Override
                         public void onSuccess(final AuthenticationResult authenticationResult) {
 
@@ -121,24 +119,31 @@ public class AuthenticationController {
                                         getAuthenticationContext(),
                                         resourceId,
                                         Constants.CLIENT_ID);
-                                result.set(authenticationResult);
+                                authenticationCallback.onSuccess(authenticationResult);
                             } else if (authenticationResult != null){
                                 // This condition can happen if user signs in with an MSA account
                                 // instead of an Office 365 account
-                                result.setException(new Throwable(authenticationResult.getErrorDescription()));
+                                authenticationCallback.onError(
+                                        new AuthenticationException(
+                                            ADALError.AUTH_FAILED,
+                                            authenticationResult.getErrorDescription()
+                                        )
+                                );
                             }
                         }
-
                         @Override
-                        public void onError(Exception t) {
-                            result.setException(t);
+                        public void onError(Exception e) {
+                            authenticationCallback.onError(e);
                         }
                     }
             );
         } else {
-            result.setException(new Throwable("Auth context verification failed. Did you set a context activity?"));
+            Log.e(TAG, "initialize - Auth context verification failed. Did you set a context activity?");
+            AuthenticationException ae = new AuthenticationException(
+                    ADALError.ACTIVITY_REQUEST_INTENT_DATA_IS_NULL,
+                    "Auth context verification failed. Did you set a context activity?");
+            throw ae;
         }
-        return result;
     }
 
     /**

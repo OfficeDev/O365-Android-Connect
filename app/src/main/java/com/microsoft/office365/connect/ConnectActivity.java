@@ -18,8 +18,10 @@ import android.widget.Toast;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.SettableFuture;
+import com.microsoft.aad.adal.AuthenticationCallback;
 import com.microsoft.aad.adal.AuthenticationResult;
 import com.microsoft.aad.adal.AuthenticationSettings;
+import com.microsoft.services.odata.interfaces.LogLevel;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -49,7 +51,8 @@ public class ConnectActivity extends ActionBarActivity {
         initializeViews();
 
         // Devices with API level lower than 18 must setup an encryption key.
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2 && AuthenticationSettings.INSTANCE.getSecretKeyData() == null) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2 &&
+                AuthenticationSettings.INSTANCE.getSecretKeyData() == null) {
                 AuthenticationSettings.INSTANCE.setSecretKey(generateSecretKey());
         }
 
@@ -60,6 +63,8 @@ public class ConnectActivity extends ActionBarActivity {
         // USE_CREDENTIALS
         // MANAGE_ACCOUNTS
         AuthenticationSettings.INSTANCE.setSkipBroker(true);
+
+        AuthenticationController.getInstance().enableLogging(LogLevel.VERBOSE);
     }
 
     /**
@@ -87,41 +92,38 @@ public class ConnectActivity extends ActionBarActivity {
         final Intent sendMailIntent = new Intent(this, SendMailActivity.class);
 
         AuthenticationController.getInstance().setContextActivity(this);
-        SettableFuture<AuthenticationResult> future = AuthenticationController
-                .getInstance()
-                .initialize();
+        AuthenticationController.getInstance().initialize(
+                new AuthenticationCallback<AuthenticationResult>() {
+                    /**
+                     * If the connection is successful, the activity extracts the username and
+                     * displayableId values from the authentication result object and sends them
+                     * to the SendMail activity.
+                     * @param result The authentication result object that contains information about
+                     *               the user and the tokens.
+                     */
+                    @Override
+                    public void onSuccess(AuthenticationResult result) {
+                        Log.i(TAG, "onConnectButtonClick - Successfully connected to Office 365");
 
-        Futures.addCallback(future, new FutureCallback<AuthenticationResult>() {
-            /**
-             * If the connection is successful, the activity extracts the username and
-             * displayableId values from the authentication result object and sends them
-             * to the SendMail activity.
-             * @param result The authentication result object that contains information about
-             *               the user and the tokens.
-             */
-            @Override
-            public void onSuccess(AuthenticationResult result) {
-                Log.i(TAG, "onConnectButtonClick - Successfully connected to Office 365");
+                        sendMailIntent.putExtra("givenName", result
+                                .getUserInfo()
+                                .getGivenName());
+                        sendMailIntent.putExtra("displayableId", result
+                                .getUserInfo()
+                                .getDisplayableId());
+                        startActivity(sendMailIntent);
 
-                sendMailIntent.putExtra("givenName", result
-                        .getUserInfo()
-                        .getGivenName());
-                sendMailIntent.putExtra("displayableId", result
-                        .getUserInfo()
-                        .getDisplayableId());
-                startActivity(sendMailIntent);
+                        resetUIForConnect();
+                    }
 
-                resetUIForConnect();
-            }
-
-            @Override
-            public void onFailure(final Throwable t) {
-                Log.e(TAG, "onCreate - " + t.getMessage());
-                // We need to make sure that there are no cookies stored with the failed auth
-                AuthenticationController.getInstance().disconnect();
-                showConnectErrorUI();
-            }
-        });
+                    @Override
+                    public void onError(final Exception e) {
+                        Log.e(TAG, "onCreate - " + e.getMessage());
+                        // We need to make sure that there are no cookies stored with the failed auth
+                        AuthenticationController.getInstance().disconnect();
+                        showConnectErrorUI();
+                    }
+                });
     }
 
     /**
