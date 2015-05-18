@@ -15,9 +15,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.SettableFuture;
 import com.microsoft.aad.adal.AuthenticationCallback;
 import com.microsoft.aad.adal.AuthenticationResult;
 import com.microsoft.aad.adal.AuthenticationSettings;
@@ -64,7 +61,7 @@ public class ConnectActivity extends ActionBarActivity {
         // MANAGE_ACCOUNTS
         AuthenticationSettings.INSTANCE.setSkipBroker(true);
 
-        AuthenticationController.getInstance().enableLogging(LogLevel.VERBOSE);
+        AuthenticationManager.getInstance().enableLogging(LogLevel.VERBOSE);
     }
 
     /**
@@ -91,8 +88,8 @@ public class ConnectActivity extends ActionBarActivity {
 
         final Intent sendMailIntent = new Intent(this, SendMailActivity.class);
 
-        AuthenticationController.getInstance().setContextActivity(this);
-        AuthenticationController.getInstance().initialize(
+        AuthenticationManager.getInstance().setContextActivity(this);
+        AuthenticationManager.getInstance().initialize(
                 new AuthenticationCallback<AuthenticationResult>() {
                     /**
                      * If the connection is successful, the activity extracts the username and
@@ -120,7 +117,7 @@ public class ConnectActivity extends ActionBarActivity {
                     public void onError(final Exception e) {
                         Log.e(TAG, "onCreate - " + e.getMessage());
                         // We need to make sure that there are no cookies stored with the failed auth
-                        AuthenticationController.getInstance().disconnect();
+                        AuthenticationManager.getInstance().disconnect();
                         showConnectErrorUI();
                     }
                 });
@@ -139,7 +136,7 @@ public class ConnectActivity extends ActionBarActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.i(TAG, "onActivityResult - AuthenticationActivity has come back with results");
         super.onActivityResult(requestCode, resultCode, data);
-        AuthenticationController
+        AuthenticationManager
                 .getInstance()
                 .getAuthenticationContext()
                 .onActivityResult(requestCode, resultCode, data);

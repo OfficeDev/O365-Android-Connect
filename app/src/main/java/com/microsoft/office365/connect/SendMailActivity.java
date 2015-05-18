@@ -4,15 +4,12 @@
 package com.microsoft.office365.connect;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.CookieManager;
-import android.webkit.CookieSyncManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
@@ -21,7 +18,6 @@ import android.widget.Toast;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import com.microsoft.discoveryservices.ServiceInfo;
 
@@ -132,7 +128,7 @@ public class SendMailActivity extends ActionBarActivity {
         try {
             switch (item.getItemId()) {
                 case R.id.disconnectMenuitem:
-                    AuthenticationController.getInstance().disconnect();
+                    AuthenticationManager.getInstance().disconnect();
                     showDisconnectSuccessUI();
                     Intent connectIntent = new Intent(this, ConnectActivity.class);
                     startActivity(connectIntent);

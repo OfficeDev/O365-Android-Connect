@@ -11,7 +11,6 @@ import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 
-import com.google.common.util.concurrent.SettableFuture;
 import com.microsoft.aad.adal.ADALError;
 import com.microsoft.aad.adal.AuthenticationCallback;
 import com.microsoft.aad.adal.AuthenticationContext;
@@ -27,17 +26,17 @@ import com.microsoft.services.odata.interfaces.LogLevel;
  * Handles setup of ADAL Dependency Resolver for use in API clients.
  */
 
-public class AuthenticationController {
-    private static String TAG = "AuthenticationController";
+public class AuthenticationManager {
+    private static String TAG = "AuthenticationManager";
 
     private AuthenticationContext authContext;
     private ADALDependencyResolver dependencyResolver;
     private Activity contextActivity;
     private String resourceId;
 
-    public static synchronized AuthenticationController getInstance() {
+    public static synchronized AuthenticationManager getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new AuthenticationController();
+            INSTANCE = new AuthenticationManager();
         }
         return INSTANCE;
     }
@@ -46,13 +45,13 @@ public class AuthenticationController {
         INSTANCE = null;
     }
 
-    private static AuthenticationController INSTANCE;
+    private static AuthenticationManager INSTANCE;
 
-    private AuthenticationController() {
+    private AuthenticationManager() {
         resourceId = Constants.DISCOVERY_RESOURCE_ID;
     }
 
-    private AuthenticationController(final Activity contextActivity){
+    private AuthenticationManager(final Activity contextActivity){
         this();
         this.contextActivity = contextActivity;
     }
@@ -187,7 +186,7 @@ public class AuthenticationController {
         //Reset controller objects.
         MailController.resetInstance();
         DiscoveryController.resetInstance();
-        AuthenticationController.resetInstance();
+        AuthenticationManager.resetInstance();
 
         //Clear cookies.
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
