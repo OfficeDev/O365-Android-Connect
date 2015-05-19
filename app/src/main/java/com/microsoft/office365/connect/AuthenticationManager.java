@@ -125,6 +125,10 @@ public class AuthenticationManager {
                     @Override
                     public void onSuccess(final AuthenticationResult authenticationResult) {
                         if (authenticationResult != null && authenticationResult.getStatus() == AuthenticationStatus.Succeeded) {
+                            mDependencyResolver = new ADALDependencyResolver(
+                                    getAuthenticationContext(),
+                                    mResourceId,
+                                    Constants.CLIENT_ID);
                             authenticationCallback.onSuccess(authenticationResult);
                         } else if (authenticationResult != null) {
                             // I could not authenticate the user silently,
@@ -171,6 +175,7 @@ public class AuthenticationManager {
                             );
                         }
                     }
+
                     @Override
                     public void onError(Exception e) {
                         authenticationCallback.onError(e);
@@ -215,15 +220,6 @@ public class AuthenticationManager {
         AuthenticationManager.resetInstance();
 
         setIsUserConnected(false);
-
-        //Clear cookies.
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            CookieManager.getInstance().removeSessionCookies(null);
-            CookieManager.getInstance().flush();
-        }else{
-            CookieManager.getInstance().removeSessionCookie();
-            CookieSyncManager.getInstance().sync();
-        }
     }
 
     private boolean verifyAuthenticationContext() {
