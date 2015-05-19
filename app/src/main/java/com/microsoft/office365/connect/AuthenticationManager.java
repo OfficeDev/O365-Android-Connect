@@ -6,6 +6,8 @@
 package com.microsoft.office365.connect;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.util.Log;
 import android.webkit.CookieManager;
@@ -27,7 +29,11 @@ import com.microsoft.services.odata.interfaces.LogLevel;
  */
 
 public class AuthenticationManager {
-    private static String TAG = "AuthenticationManager";
+    private static final String TAG = "AuthenticationManager";
+    private static final String PREFERENCES_FILENAME = "ConnectFile";
+    private static final String USER_CONNECTED_VAR_NAME = "isUserConnected";
+    private static final String USER_ID_VAR_NAME = "userId";
+
 
     private AuthenticationContext mAuthenticationContext;
     private ADALDependencyResolver mDependencyResolver;
@@ -93,44 +99,14 @@ public class AuthenticationManager {
      * user's credentials and avoid interactive prompt on later calls.
      * If all tokens expire, app must call connect() again to prompt user interactively and
      * set up authentication context.
-     *
-     * @return A signal to wait on before continuing execution.
      */
     public void connect(final AuthenticationCallback authenticationCallback) {
         if (verifyAuthenticationContext()) {
-            getAuthenticationContext().acquireToken(
-                    this.mContextActivity,
-                    this.mResourceId,
-                    Constants.CLIENT_ID,
-                    Constants.REDIRECT_URI,
-                    PromptBehavior.Auto,
-                    new AuthenticationCallback<AuthenticationResult>() {
-                        @Override
-                        public void onSuccess(final AuthenticationResult authenticationResult) {
-
-                            if (authenticationResult != null && authenticationResult.getStatus() == AuthenticationStatus.Succeeded) {
-                                mDependencyResolver = new ADALDependencyResolver(
-                                        getAuthenticationContext(),
-                                        mResourceId,
-                                        Constants.CLIENT_ID);
-                                authenticationCallback.onSuccess(authenticationResult);
-                            } else if (authenticationResult != null){
-                                // This condition can happen if user signs in with an MSA account
-                                // instead of an Office 365 account
-                                authenticationCallback.onError(
-                                        new AuthenticationException(
-                                            ADALError.AUTH_FAILED,
-                                            authenticationResult.getErrorDescription()
-                                        )
-                                );
-                            }
-                        }
-                        @Override
-                        public void onError(Exception e) {
-                            authenticationCallback.onError(e);
-                        }
-                    }
-            );
+            if(isUserConnected()) {
+                authenticateSilent(authenticationCallback);
+            } else {
+                authenticateAlwaysPrompt(authenticationCallback);
+            }
         } else {
             Log.e(TAG, "connect - Auth context verification failed. Did you set a context activity?");
             AuthenticationException ae = new AuthenticationException(
@@ -138,6 +114,69 @@ public class AuthenticationManager {
                     "Auth context verification failed. Did you set a context activity?");
             throw ae;
         }
+    }
+
+    private void authenticateSilent(final AuthenticationCallback authenticationCallback){
+        getAuthenticationContext().acquireTokenSilent(
+                this.mResourceId,
+                Constants.CLIENT_ID,
+                getUserId(),
+                new AuthenticationCallback<AuthenticationResult>() {
+                    @Override
+                    public void onSuccess(final AuthenticationResult authenticationResult) {
+                        if (authenticationResult != null && authenticationResult.getStatus() == AuthenticationStatus.Succeeded) {
+                            authenticationCallback.onSuccess(authenticationResult);
+                        } else if (authenticationResult != null) {
+                            // I could not authenticate the user silently,
+                            // falling back to prompt the user for credentials.
+                            authenticateAlwaysPrompt(authenticationCallback);
+                        }
+                    }
+                    @Override
+                    public void onError(Exception e) {
+                        // I could not authenticate the user silently,
+                        // falling back to prompt the user for credentials.
+                        authenticateAlwaysPrompt(authenticationCallback);
+                    }
+                }
+        );
+    }
+
+    private void authenticateAlwaysPrompt(final AuthenticationCallback authenticationCallback) {
+        getAuthenticationContext().acquireToken(
+                this.mContextActivity,
+                this.mResourceId,
+                Constants.CLIENT_ID,
+                Constants.REDIRECT_URI,
+                PromptBehavior.Always,
+                new AuthenticationCallback<AuthenticationResult>() {
+                    @Override
+                    public void onSuccess(final AuthenticationResult authenticationResult) {
+                        if (authenticationResult != null && authenticationResult.getStatus() == AuthenticationStatus.Succeeded) {
+                            setUserId(authenticationResult.getUserInfo().getUserId());
+                            setIsUserConnected(true);
+                            mDependencyResolver = new ADALDependencyResolver(
+                                    getAuthenticationContext(),
+                                    mResourceId,
+                                    Constants.CLIENT_ID);
+                            authenticationCallback.onSuccess(authenticationResult);
+                        } else if (authenticationResult != null) {
+                            // This condition can happen if user signs in with an MSA account
+                            // instead of an Office 365 account
+                            authenticationCallback.onError(
+                                    new AuthenticationException(
+                                            ADALError.AUTH_FAILED,
+                                            authenticationResult.getErrorDescription()
+                                    )
+                            );
+                        }
+                    }
+                    @Override
+                    public void onError(Exception e) {
+                        authenticationCallback.onError(e);
+                    }
+                }
+        );
     }
 
     /**
@@ -160,14 +199,6 @@ public class AuthenticationManager {
         return getInstance().mDependencyResolver;
     }
 
-    private boolean verifyAuthenticationContext() {
-        if (this.mContextActivity == null) {
-            Log.e(TAG,"Must set context activity");
-            return false;
-        }
-        return true;
-    }
-
     /**
      * Disconnects the app from Office 365 by clearing the token cache, setting the client objects
      * to null, and clearing the app cookies from the device.
@@ -183,6 +214,8 @@ public class AuthenticationManager {
         DiscoveryController.resetInstance();
         AuthenticationManager.resetInstance();
 
+        setIsUserConnected(false);
+
         //Clear cookies.
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
             CookieManager.getInstance().removeSessionCookies(null);
@@ -191,5 +224,49 @@ public class AuthenticationManager {
             CookieManager.getInstance().removeSessionCookie();
             CookieSyncManager.getInstance().sync();
         }
+    }
+
+    private boolean verifyAuthenticationContext() {
+        if (this.mContextActivity == null) {
+            Log.e(TAG, "Must set context activity");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isUserConnected(){
+        SharedPreferences settings = this
+                .mContextActivity
+                .getSharedPreferences(PREFERENCES_FILENAME, Context.MODE_PRIVATE);
+
+        return settings.getBoolean(USER_CONNECTED_VAR_NAME, false);
+    }
+
+    private void setIsUserConnected(boolean value){
+        SharedPreferences settings = this
+                .mContextActivity
+                .getSharedPreferences(PREFERENCES_FILENAME, Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putBoolean(USER_CONNECTED_VAR_NAME, value);
+        editor.commit();
+    }
+
+    private String getUserId(){
+        SharedPreferences settings = this
+                .mContextActivity
+                .getSharedPreferences(PREFERENCES_FILENAME, Context.MODE_PRIVATE);
+
+        return settings.getString(USER_ID_VAR_NAME, "");
+    }
+
+    private void setUserId(String value){
+        SharedPreferences settings = this
+                .mContextActivity
+                .getSharedPreferences(PREFERENCES_FILENAME, Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString(USER_ID_VAR_NAME, value);
+        editor.commit();
     }
 }

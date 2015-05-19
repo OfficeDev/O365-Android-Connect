@@ -61,7 +61,7 @@ public class ConnectActivity extends ActionBarActivity {
         // MANAGE_ACCOUNTS
         AuthenticationSettings.INSTANCE.setSkipBroker(true);
 
-        AuthenticationManager.getInstance().enableLogging(LogLevel.VERBOSE);
+        AuthenticationManager.getInstance().setContextActivity(this);
     }
 
     /**
@@ -88,7 +88,6 @@ public class ConnectActivity extends ActionBarActivity {
 
         final Intent sendMailIntent = new Intent(this, SendMailActivity.class);
 
-        AuthenticationManager.getInstance().setContextActivity(this);
         AuthenticationManager.getInstance().connect(
                 new AuthenticationCallback<AuthenticationResult>() {
                     /**
