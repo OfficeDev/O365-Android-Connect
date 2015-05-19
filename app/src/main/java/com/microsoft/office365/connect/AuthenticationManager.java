@@ -55,7 +55,6 @@ public class AuthenticationManager {
 
     /**
      * Set the context activity before connecting to the currently active activity.
-     *
      * @param contextActivity Currently active activity which can be utilized for interactive
      *                        prompt.
      */
@@ -91,17 +90,16 @@ public class AuthenticationManager {
     }
 
     /**
-     * Description: Calls AuthenticationContext.acquireToken(...) once to connect with
-     * user's credentials and avoid interactive prompt on later calls.
-     * If all tokens expire, app must call connect() again to prompt user interactively and
-     * set up authentication context.
+     * Calls {@link AuthenticationManager#authenticatePrompt(AuthenticationCallback)} if no user id is stored in the shared preferences.
+     * Calls {@link AuthenticationManager#authenticateSilent(AuthenticationCallback)} otherwise.
+     * @param authenticationCallback The callback to notify when the processing is finished.
      */
     public void connect(final AuthenticationCallback authenticationCallback) {
         if (verifyAuthenticationContext()) {
             if(isUserConnected()) {
                 authenticateSilent(authenticationCallback);
             } else {
-                authenticateAlwaysPrompt(authenticationCallback);
+                authenticatePrompt(authenticationCallback);
             }
         } else {
             Log.e(TAG, "connect - Auth context verification failed. Did you set a context activity?");
@@ -112,7 +110,12 @@ public class AuthenticationManager {
         }
     }
 
-    private void authenticateSilent(final AuthenticationCallback authenticationCallback){
+    /**
+     * Calls acquireTokenSilent with the user id stored in shared preferences.
+     * In case of an error, it falls back to {@link AuthenticationManager#authenticatePrompt(AuthenticationCallback)}.
+     * @param authenticationCallback The callback to notify when the processing is finished.
+     */
+    private void authenticateSilent(final AuthenticationCallback authenticationCallback) {
         getAuthenticationContext().acquireTokenSilent(
                 this.mResourceId,
                 Constants.CLIENT_ID,
@@ -129,7 +132,7 @@ public class AuthenticationManager {
                         } else if (authenticationResult != null) {
                             // I could not authenticate the user silently,
                             // falling back to prompt the user for credentials.
-                            authenticateAlwaysPrompt(authenticationCallback);
+                            authenticatePrompt(authenticationCallback);
                         }
                     }
 
@@ -137,13 +140,17 @@ public class AuthenticationManager {
                     public void onError(Exception e) {
                         // I could not authenticate the user silently,
                         // falling back to prompt the user for credentials.
-                        authenticateAlwaysPrompt(authenticationCallback);
+                        authenticatePrompt(authenticationCallback);
                     }
                 }
         );
     }
 
-    private void authenticateAlwaysPrompt(final AuthenticationCallback authenticationCallback) {
+    /**
+     * Calls acquireToken to prompt the user for credentials.
+     * @param authenticationCallback The callback to notify when the processing is finished.
+     */
+    private void authenticatePrompt(final AuthenticationCallback authenticationCallback) {
         getAuthenticationContext().acquireToken(
                 this.mContextActivity,
                 this.mResourceId,
@@ -181,9 +188,8 @@ public class AuthenticationManager {
     }
 
     /**
-     * Gets AuthenticationContext for AAD.
-     *
-     * @return authenticationContext, if successful
+     * Gets authentication context for Azure Active Directory.
+     * @return an authentication context, if successful.
      */
     public AuthenticationContext getAuthenticationContext() {
         if (mAuthenticationContext == null) {
@@ -196,13 +202,19 @@ public class AuthenticationManager {
         return mAuthenticationContext;
     }
 
+    /**
+     * Dependency resolver that can be used to create client objects.
+     * The {@link DiscoveryController#getServiceInfo} method uses it to create a DiscoveryClient object.
+     * The {@link MailController#sendMail(String, String, String)} uses it to create an OutlookClient object.
+     * @return The dependency resolver object.
+     */
     public DependencyResolver getDependencyResolver() {
         return getInstance().mDependencyResolver;
     }
 
     /**
      * Disconnects the app from Office 365 by clearing the token cache, setting the client objects
-     * to null, and clearing the app cookies from the device.
+     * to null, and removing the user id from shred preferences.
      */
     public void disconnect(){
         // Clear tokens.
@@ -250,7 +262,7 @@ public class AuthenticationManager {
 
         SharedPreferences.Editor editor = settings.edit();
         editor.putString(USER_ID_VAR_NAME, value);
-        editor.commit();
+        editor.apply();
     }
 
     private void removeUserId(){
@@ -260,6 +272,6 @@ public class AuthenticationManager {
 
         SharedPreferences.Editor editor = settings.edit();
         editor.remove(USER_ID_VAR_NAME);
-        editor.commit();
+        editor.apply();
     }
 }
