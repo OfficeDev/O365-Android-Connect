@@ -96,7 +96,7 @@ public class AuthenticationManager {
      */
     public void connect(final AuthenticationCallback authenticationCallback) {
         if (verifyAuthenticationContext()) {
-            if(isUserConnected()) {
+            if(isConnected()) {
                 authenticateSilent(authenticationCallback);
             } else {
                 authenticatePrompt(authenticationCallback);
@@ -239,7 +239,7 @@ public class AuthenticationManager {
         return true;
     }
 
-    private boolean isUserConnected(){
+    private boolean isConnected(){
         SharedPreferences settings = this
                 .mContextActivity
                 .getSharedPreferences(PREFERENCES_FILENAME, Context.MODE_PRIVATE);
