@@ -59,8 +59,6 @@ public class ConnectActivity extends ActionBarActivity {
         // USE_CREDENTIALS
         // MANAGE_ACCOUNTS
         AuthenticationSettings.INSTANCE.setSkipBroker(true);
-
-        AuthenticationManager.getInstance().setContextActivity(this);
     }
 
     /**
@@ -86,6 +84,7 @@ public class ConnectActivity extends ActionBarActivity {
         }
 
         final Intent sendMailIntent = new Intent(this, SendMailActivity.class);
+        AuthenticationManager.getInstance().setContextActivity(this);
 
         AuthenticationManager.getInstance().connect(
                 new AuthenticationCallback<AuthenticationResult>() {
@@ -114,8 +113,6 @@ public class ConnectActivity extends ActionBarActivity {
                     @Override
                     public void onError(final Exception e) {
                         Log.e(TAG, "onCreate - " + e.getMessage());
-                        // We need to make sure that there is no data stored with the failed auth
-                        AuthenticationManager.getInstance().disconnect();
                         showConnectErrorUI();
                     }
                 });

@@ -169,6 +169,8 @@ public class AuthenticationManager {
                                     Constants.CLIENT_ID);
                             authenticationCallback.onSuccess(authenticationResult);
                         } else if (authenticationResult != null) {
+                            // We need to make sure that there is no data stored with the failed auth
+                            AuthenticationManager.getInstance().disconnect();
                             // This condition can happen if user signs in with an MSA account
                             // instead of an Office 365 account
                             authenticationCallback.onError(
@@ -182,6 +184,8 @@ public class AuthenticationManager {
 
                     @Override
                     public void onError(Exception e) {
+                        // We need to make sure that there is no data stored with the failed auth
+                        AuthenticationManager.getInstance().disconnect();
                         authenticationCallback.onError(e);
                     }
                 }
