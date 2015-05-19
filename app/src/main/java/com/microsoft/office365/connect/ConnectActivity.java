@@ -18,7 +18,6 @@ import android.widget.Toast;
 import com.microsoft.aad.adal.AuthenticationCallback;
 import com.microsoft.aad.adal.AuthenticationResult;
 import com.microsoft.aad.adal.AuthenticationSettings;
-import com.microsoft.services.odata.interfaces.LogLevel;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -115,30 +114,11 @@ public class ConnectActivity extends ActionBarActivity {
                     @Override
                     public void onError(final Exception e) {
                         Log.e(TAG, "onCreate - " + e.getMessage());
-                        // We need to make sure that there are no cookies stored with the failed auth
+                        // We need to make sure that there is no data stored with the failed auth
                         AuthenticationManager.getInstance().disconnect();
                         showConnectErrorUI();
                     }
                 });
-    }
-
-    /**
-     * This activity gets notified about the completion of the ADAL activity through this method.
-     * @param requestCode The integer request code originally supplied to startActivityForResult(),
-     *                    allowing you to identify who this result came from.
-     * @param resultCode The integer result code returned by the child activity through its
-     *                   setResult().
-     * @param data An Intent, which can return result data to the caller (various data
-     *             can be attached to Intent "extras").
-     */
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.i(TAG, "onActivityResult - AuthenticationActivity has come back with results");
-        super.onActivityResult(requestCode, resultCode, data);
-        AuthenticationManager
-                .getInstance()
-                .getAuthenticationContext()
-                .onActivityResult(requestCode, resultCode, data);
     }
 
     /**

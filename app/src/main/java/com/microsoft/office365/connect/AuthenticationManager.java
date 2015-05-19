@@ -152,11 +152,12 @@ public class AuthenticationManager {
      */
     private void authenticatePrompt(final AuthenticationCallback authenticationCallback) {
         getAuthenticationContext().acquireToken(
-                this.mContextActivity,
                 this.mResourceId,
                 Constants.CLIENT_ID,
                 Constants.REDIRECT_URI,
+                null,
                 PromptBehavior.Always,
+                null,
                 new AuthenticationCallback<AuthenticationResult>() {
                     @Override
                     public void onSuccess(final AuthenticationResult authenticationResult) {
