@@ -8,10 +8,7 @@ package com.microsoft.office365.connect;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.util.Log;
-import android.webkit.CookieManager;
-import android.webkit.CookieSyncManager;
 
 import com.microsoft.aad.adal.ADALError;
 import com.microsoft.aad.adal.AuthenticationCallback;
@@ -31,7 +28,6 @@ import com.microsoft.services.odata.interfaces.LogLevel;
 public class AuthenticationManager {
     private static final String TAG = "AuthenticationManager";
     private static final String PREFERENCES_FILENAME = "ConnectFile";
-    private static final String USER_CONNECTED_VAR_NAME = "isUserConnected";
     private static final String USER_ID_VAR_NAME = "userId";
 
 
@@ -136,6 +132,7 @@ public class AuthenticationManager {
                             authenticateAlwaysPrompt(authenticationCallback);
                         }
                     }
+
                     @Override
                     public void onError(Exception e) {
                         // I could not authenticate the user silently,
@@ -158,7 +155,6 @@ public class AuthenticationManager {
                     public void onSuccess(final AuthenticationResult authenticationResult) {
                         if (authenticationResult != null && authenticationResult.getStatus() == AuthenticationStatus.Succeeded) {
                             setUserId(authenticationResult.getUserInfo().getUserId());
-                            setIsUserConnected(true);
                             mDependencyResolver = new ADALDependencyResolver(
                                     getAuthenticationContext(),
                                     mResourceId,
@@ -209,17 +205,18 @@ public class AuthenticationManager {
      * to null, and clearing the app cookies from the device.
      */
     public void disconnect(){
-        //Clear tokens.
+        // Clear tokens.
         if(getAuthenticationContext().getCache() != null) {
             getAuthenticationContext().getCache().removeAll();
         }
 
-        //Reset controller objects.
+        // Reset controller objects.
         MailController.resetInstance();
         DiscoveryController.resetInstance();
         AuthenticationManager.resetInstance();
 
-        setIsUserConnected(false);
+        // Forget the user
+        removeUserId();
     }
 
     private boolean verifyAuthenticationContext() {
@@ -235,17 +232,7 @@ public class AuthenticationManager {
                 .mContextActivity
                 .getSharedPreferences(PREFERENCES_FILENAME, Context.MODE_PRIVATE);
 
-        return settings.getBoolean(USER_CONNECTED_VAR_NAME, false);
-    }
-
-    private void setIsUserConnected(boolean value){
-        SharedPreferences settings = this
-                .mContextActivity
-                .getSharedPreferences(PREFERENCES_FILENAME, Context.MODE_PRIVATE);
-
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putBoolean(USER_CONNECTED_VAR_NAME, value);
-        editor.commit();
+        return settings.contains(USER_ID_VAR_NAME);
     }
 
     private String getUserId(){
@@ -263,6 +250,16 @@ public class AuthenticationManager {
 
         SharedPreferences.Editor editor = settings.edit();
         editor.putString(USER_ID_VAR_NAME, value);
+        editor.commit();
+    }
+
+    private void removeUserId(){
+        SharedPreferences settings = this
+                .mContextActivity
+                .getSharedPreferences(PREFERENCES_FILENAME, Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = settings.edit();
+        editor.remove(USER_ID_VAR_NAME);
         editor.commit();
     }
 }
