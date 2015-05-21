@@ -139,7 +139,7 @@ public class AuthenticationManager {
      * Calls {@link AuthenticationManager#authenticateSilent(AuthenticationCallback)} otherwise.
      * @param authenticationCallback The callback to notify when the processing is finished.
      */
-    public void connect(final AuthenticationCallback authenticationCallback) {
+    public void connect(final AuthenticationCallback<AuthenticationResult> authenticationCallback) {
         if (verifyAuthenticationContext()) {
             if(isConnected()) {
                 authenticateSilent(authenticationCallback);
@@ -148,10 +148,9 @@ public class AuthenticationManager {
             }
         } else {
             Log.e(TAG, "connect - Auth context verification failed. Did you set a context activity?");
-            AuthenticationException authenticationException = new AuthenticationException(
+            throw new AuthenticationException(
                     ADALError.ACTIVITY_REQUEST_INTENT_DATA_IS_NULL,
                     "Auth context verification failed. Did you set a context activity?");
-            throw authenticationException;
         }
     }
 
@@ -160,7 +159,7 @@ public class AuthenticationManager {
      * In case of an error, it falls back to {@link AuthenticationManager#authenticatePrompt(AuthenticationCallback)}.
      * @param authenticationCallback The callback to notify when the processing is finished.
      */
-    private void authenticateSilent(final AuthenticationCallback authenticationCallback) {
+    private void authenticateSilent(final AuthenticationCallback<AuthenticationResult> authenticationCallback) {
         getAuthenticationContext().acquireTokenSilent(
                 this.mResourceId,
                 Constants.CLIENT_ID,
@@ -195,7 +194,7 @@ public class AuthenticationManager {
      * Calls acquireToken to prompt the user for credentials.
      * @param authenticationCallback The callback to notify when the processing is finished.
      */
-    private void authenticatePrompt(final AuthenticationCallback authenticationCallback) {
+    private void authenticatePrompt(final AuthenticationCallback<AuthenticationResult> authenticationCallback) {
         getAuthenticationContext().acquireToken(
                 this.mResourceId,
                 Constants.CLIENT_ID,
