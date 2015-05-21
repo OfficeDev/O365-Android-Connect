@@ -100,6 +100,25 @@ public class ConnectActivity extends ActionBarActivity {
                 });
     }
 
+    /**
+     * This activity gets notified about the completion of the ADAL activity through this method.
+     * @param requestCode The integer request code originally supplied to startActivityForResult(),
+     *                    allowing you to identify who this result came from.
+     * @param resultCode The integer result code returned by the child activity through its
+     *                   setResult().
+     * @param data An Intent, which can return result data to the caller (various data
+     *             can be attached to Intent "extras").
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.i(TAG, "onActivityResult - AuthenticationActivity has come back with results");
+        super.onActivityResult(requestCode, resultCode, data);
+        AuthenticationManager
+                .getInstance()
+                .getAuthenticationContext()
+                .onActivityResult(requestCode, resultCode, data);
+    }
+
     private void initializeViews(){
         mConnectButton = (Button)findViewById(R.id.connectButton);
         mConnectProgressBar = (ProgressBar)findViewById(R.id.connectProgressBar);

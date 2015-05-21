@@ -32,6 +32,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.microsoft.office365.connect.ConnectActivity" />
         </activity>
+        <activity
+            android:name="com.microsoft.aad.adal.AuthenticationActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>
