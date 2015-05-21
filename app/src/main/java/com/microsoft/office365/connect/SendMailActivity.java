@@ -5,7 +5,7 @@ package com.microsoft.office365.connect;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,7 +30,7 @@ import java.util.concurrent.ExecutionException;
  * The activity uses the DiscoveryController class to get the service endpoint. It also
  * uses the MailController to send the message.
  */
-public class SendMailActivity extends ActionBarActivity {
+public class SendMailActivity extends AppCompatActivity {
 
     private static final String TAG = "SendMailActivity";
 

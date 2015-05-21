@@ -5,7 +5,7 @@ package com.microsoft.office365.connect;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -26,7 +26,7 @@ import java.util.UUID;
  * If there are cached tokens, the app tries to reuse them.
  * The activity redirects the user to the SendMailActivity upon successful connection.
  */
-public class ConnectActivity extends ActionBarActivity {
+public class ConnectActivity extends AppCompatActivity {
 
     private static final String TAG = "ConnectActivity";
 
