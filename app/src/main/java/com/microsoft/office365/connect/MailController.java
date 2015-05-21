@@ -41,10 +41,6 @@ public class MailController {
         return INSTANCE;
     }
 
-    public static synchronized void resetInstance() {
-        INSTANCE = null;
-    }
-
     private static MailController INSTANCE;
 
     /**

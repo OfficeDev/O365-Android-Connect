@@ -272,9 +272,7 @@ public class AuthenticationManager {
             getAuthenticationContext().getCache().removeAll();
         }
 
-        // Reset controller objects.
-        MailController.resetInstance();
-        DiscoveryController.resetInstance();
+        // Reset the AuthenticationManager object
         AuthenticationManager.resetInstance();
 
         // Forget the user

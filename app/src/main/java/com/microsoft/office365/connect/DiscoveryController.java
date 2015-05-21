@@ -34,10 +34,6 @@ public class DiscoveryController {
         return INSTANCE;
     }
 
-    public static synchronized void resetInstance() {
-        INSTANCE = null;
-    }
-
     private static DiscoveryController INSTANCE;
 
     /**
