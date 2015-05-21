@@ -4,9 +4,7 @@
 package com.microsoft.office365.connect;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
@@ -17,9 +15,7 @@ import android.widget.Toast;
 
 import com.microsoft.aad.adal.AuthenticationCallback;
 import com.microsoft.aad.adal.AuthenticationResult;
-import com.microsoft.aad.adal.AuthenticationSettings;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.UUID;
 
@@ -45,20 +41,6 @@ public class ConnectActivity extends ActionBarActivity {
         setContentView(R.layout.activity_connect);
 
         initializeViews();
-
-        // Devices with API level lower than 18 must setup an encryption key.
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2 &&
-                AuthenticationSettings.INSTANCE.getSecretKeyData() == null) {
-                AuthenticationSettings.INSTANCE.setSecretKey(generateSecretKey());
-        }
-
-        // We're not using Microsoft Intune's Company portal app,
-        // skip the broker check so we don't get warnings about the following permissions
-        // in manifest:
-        // GET_ACCOUNTS
-        // USE_CREDENTIALS
-        // MANAGE_ACCOUNTS
-        AuthenticationSettings.INSTANCE.setSkipBroker(true);
     }
 
     /**
@@ -118,32 +100,6 @@ public class ConnectActivity extends ActionBarActivity {
                 });
     }
 
-    /**
-     * Generates an encryption key for devices with API level lower than 18 using the
-     * ANDROID_ID value as a seed.
-     * In production scenarios, you should come up with your own implementation of this method.
-     * Consider that your algorithm must return the same key so it can encrypt/decrypt values
-     * successfully.
-     * @return The encryption key in a 32 byte long array.
-     */
-    private byte[] generateSecretKey() {
-        byte[] key = new byte[32];
-        byte[] android_id = null;
-
-        try{
-            android_id = Settings.Secure.ANDROID_ID.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e){
-            Log.e(TAG, "generateSecretKey - " + e.getMessage());
-            showEncryptionKeyErrorUI();
-        }
-
-        for(int i = 0; i < key.length; i++){
-            key[i] = android_id[i % android_id.length];
-        }
-
-        return key;
-    }
-
     private void initializeViews(){
         mConnectButton = (Button)findViewById(R.id.connectButton);
         mConnectProgressBar = (ProgressBar)findViewById(R.id.connectProgressBar);
@@ -163,17 +119,6 @@ public class ConnectActivity extends ActionBarActivity {
         mTitleTextView.setVisibility(View.GONE);
         mDescriptionTextView.setVisibility(View.GONE);
         mConnectProgressBar.setVisibility(View.VISIBLE);
-    }
-
-    private void showEncryptionKeyErrorUI(){
-        mTitleTextView.setText(R.string.title_text_error);
-        mTitleTextView.setVisibility(View.VISIBLE);
-        mDescriptionTextView.setText(R.string.connect_text_error);
-        mDescriptionTextView.setVisibility(View.VISIBLE);
-        Toast.makeText(
-                ConnectActivity.this,
-                R.string.encryption_key_text_error,
-                Toast.LENGTH_LONG).show();
     }
 
     private void showConnectErrorUI(){

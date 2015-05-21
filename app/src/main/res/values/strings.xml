@@ -23,7 +23,6 @@
     <string name="sendmail_text_error">\nSorry, can\'t send the email.\nHint: Check logcat for details.</string>
 
     <!-- Toast error messages -->
-    <string name="encryption_key_text_error">Error setting up encryption key\nCheck logcat for details</string>
     <string name="connect_toast_text_error">Error connecting to Office 365\nCheck logcat for details</string>
     <string name="discover_toast_text_error">Error finding mail service\nCheck logcat for details</string>
     <string name="send_mail_toast_text_error">Error sending email\nCheck logcat for details</string>
