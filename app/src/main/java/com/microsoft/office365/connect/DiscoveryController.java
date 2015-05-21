@@ -34,10 +34,6 @@ public class DiscoveryController {
         return INSTANCE;
     }
 
-    public static synchronized void resetInstance() {
-        INSTANCE = null;
-    }
-
     private static DiscoveryController INSTANCE;
 
     /**
@@ -70,8 +66,8 @@ public class DiscoveryController {
                 result.setException(noSuchElementException);
             }
         } else { // The services have not been cached yet. Go ask the discovery service.
-            AuthenticationController.getInstance().setResourceId(Constants.DISCOVERY_RESOURCE_ID);
-            ADALDependencyResolver dependencyResolver = (ADALDependencyResolver) AuthenticationController
+            AuthenticationManager.getInstance().setResourceId(Constants.DISCOVERY_RESOURCE_ID);
+            ADALDependencyResolver dependencyResolver = (ADALDependencyResolver) AuthenticationManager
                     .getInstance()
                     .getDependencyResolver();
 

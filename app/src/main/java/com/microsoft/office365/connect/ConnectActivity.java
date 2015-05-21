@@ -4,10 +4,8 @@
 package com.microsoft.office365.connect;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -15,13 +13,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.SettableFuture;
+import com.microsoft.aad.adal.AuthenticationCallback;
 import com.microsoft.aad.adal.AuthenticationResult;
-import com.microsoft.aad.adal.AuthenticationSettings;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.UUID;
 
@@ -32,7 +26,7 @@ import java.util.UUID;
  * If there are cached tokens, the app tries to reuse them.
  * The activity redirects the user to the SendMailActivity upon successful connection.
  */
-public class ConnectActivity extends ActionBarActivity {
+public class ConnectActivity extends AppCompatActivity {
 
     private static final String TAG = "ConnectActivity";
 
@@ -47,19 +41,6 @@ public class ConnectActivity extends ActionBarActivity {
         setContentView(R.layout.activity_connect);
 
         initializeViews();
-
-        // Devices with API level lower than 18 must setup an encryption key.
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2 && AuthenticationSettings.INSTANCE.getSecretKeyData() == null) {
-                AuthenticationSettings.INSTANCE.setSecretKey(generateSecretKey());
-        }
-
-        // We're not using Microsoft Intune's Company portal app,
-        // skip the broker check so we don't get warnings about the following permissions
-        // in manifest:
-        // GET_ACCOUNTS
-        // USE_CREDENTIALS
-        // MANAGE_ACCOUNTS
-        AuthenticationSettings.INSTANCE.setSkipBroker(true);
     }
 
     /**
@@ -85,43 +66,38 @@ public class ConnectActivity extends ActionBarActivity {
         }
 
         final Intent sendMailIntent = new Intent(this, SendMailActivity.class);
+        AuthenticationManager.getInstance().setContextActivity(this);
 
-        AuthenticationController.getInstance().setContextActivity(this);
-        SettableFuture<AuthenticationResult> future = AuthenticationController
-                .getInstance()
-                .initialize();
+        AuthenticationManager.getInstance().connect(
+                new AuthenticationCallback<AuthenticationResult>() {
+                    /**
+                     * If the connection is successful, the activity extracts the username and
+                     * displayableId values from the authentication result object and sends them
+                     * to the SendMail activity.
+                     * @param result The authentication result object that contains information about
+                     *               the user and the tokens.
+                     */
+                    @Override
+                    public void onSuccess(AuthenticationResult result) {
+                        Log.i(TAG, "onConnectButtonClick - Successfully connected to Office 365");
 
-        Futures.addCallback(future, new FutureCallback<AuthenticationResult>() {
-            /**
-             * If the connection is successful, the activity extracts the username and
-             * displayableId values from the authentication result object and sends them
-             * to the SendMail activity.
-             * @param result The authentication result object that contains information about
-             *               the user and the tokens.
-             */
-            @Override
-            public void onSuccess(AuthenticationResult result) {
-                Log.i(TAG, "onConnectButtonClick - Successfully connected to Office 365");
+                        sendMailIntent.putExtra("givenName", result
+                                .getUserInfo()
+                                .getGivenName());
+                        sendMailIntent.putExtra("displayableId", result
+                                .getUserInfo()
+                                .getDisplayableId());
+                        startActivity(sendMailIntent);
 
-                sendMailIntent.putExtra("givenName", result
-                        .getUserInfo()
-                        .getGivenName());
-                sendMailIntent.putExtra("displayableId", result
-                        .getUserInfo()
-                        .getDisplayableId());
-                startActivity(sendMailIntent);
+                        resetUIForConnect();
+                    }
 
-                resetUIForConnect();
-            }
-
-            @Override
-            public void onFailure(final Throwable t) {
-                Log.e(TAG, "onCreate - " + t.getMessage());
-                // We need to make sure that there are no cookies stored with the failed auth
-                AuthenticationController.getInstance().disconnect();
-                showConnectErrorUI();
-            }
-        });
+                    @Override
+                    public void onError(final Exception e) {
+                        Log.e(TAG, "onCreate - " + e.getMessage());
+                        showConnectErrorUI();
+                    }
+                });
     }
 
     /**
@@ -137,36 +113,10 @@ public class ConnectActivity extends ActionBarActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.i(TAG, "onActivityResult - AuthenticationActivity has come back with results");
         super.onActivityResult(requestCode, resultCode, data);
-        AuthenticationController
+        AuthenticationManager
                 .getInstance()
                 .getAuthenticationContext()
                 .onActivityResult(requestCode, resultCode, data);
-    }
-
-    /**
-     * Generates an encryption key for devices with API level lower than 18 using the
-     * ANDROID_ID value as a seed.
-     * In production scenarios, you should come up with your own implementation of this method.
-     * Consider that your algorithm must return the same key so it can encrypt/decrypt values
-     * successfully.
-     * @return The encryption key in a 32 byte long array.
-     */
-    private byte[] generateSecretKey() {
-        byte[] key = new byte[32];
-        byte[] android_id = null;
-
-        try{
-            android_id = Settings.Secure.ANDROID_ID.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e){
-            Log.e(TAG, "generateSecretKey - " + e.getMessage());
-            showEncryptionKeyErrorUI();
-        }
-
-        for(int i = 0; i < key.length; i++){
-            key[i] = android_id[i % android_id.length];
-        }
-
-        return key;
     }
 
     private void initializeViews(){
@@ -188,17 +138,6 @@ public class ConnectActivity extends ActionBarActivity {
         mTitleTextView.setVisibility(View.GONE);
         mDescriptionTextView.setVisibility(View.GONE);
         mConnectProgressBar.setVisibility(View.VISIBLE);
-    }
-
-    private void showEncryptionKeyErrorUI(){
-        mTitleTextView.setText(R.string.title_text_error);
-        mTitleTextView.setVisibility(View.VISIBLE);
-        mDescriptionTextView.setText(R.string.connect_text_error);
-        mDescriptionTextView.setVisibility(View.VISIBLE);
-        Toast.makeText(
-                ConnectActivity.this,
-                R.string.encryption_key_text_error,
-                Toast.LENGTH_LONG).show();
     }
 
     private void showConnectErrorUI(){

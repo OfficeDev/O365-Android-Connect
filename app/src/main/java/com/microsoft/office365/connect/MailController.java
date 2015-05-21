@@ -41,10 +41,6 @@ public class MailController {
         return INSTANCE;
     }
 
-    public static synchronized void resetInstance() {
-        INSTANCE = null;
-    }
-
     private static MailController INSTANCE;
 
     /**
@@ -93,8 +89,8 @@ public class MailController {
         final SettableFuture<Boolean> result = SettableFuture.create();
 
         try {
-            AuthenticationController.getInstance().setResourceId(mServiceResourceId);
-            ADALDependencyResolver dependencyResolver = (ADALDependencyResolver) AuthenticationController
+            AuthenticationManager.getInstance().setResourceId(mServiceResourceId);
+            ADALDependencyResolver dependencyResolver = (ADALDependencyResolver) AuthenticationManager
                     .getInstance()
                     .getDependencyResolver();
 
