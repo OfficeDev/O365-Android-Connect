@@ -39,7 +39,7 @@ You can also [add a native client application in Azure](http://aka.ms/o365-andro
 
 Once you've built the Connect sample, you can run it on an emulator or device.
 
-If you want to know more about the sample, visit our [understanding the code](https://github.com/OfficeDev/O365-Android-Connect/wiki/Understanding-the-Connect-sample-code) wiki page.
+To learn more about the sample, visit our [understanding the code](https://github.com/OfficeDev/O365-Android-Connect/wiki/Understanding-the-Connect-sample-code) wiki page. If you just want to use this code sample in your app, visit the [Using the O365 Android Connect sample code in your app](https://github.com/OfficeDev/O365-Android-Connect/wiki/Using-the-O365-Android-Connect-sample-code-in-your-app).
 
 ## Questions and comments
 
