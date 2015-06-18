@@ -19,7 +19,7 @@ To run the Connect sample, your device needs to meet the following requirements:
 To use the Office 365 Connect sample for Android you need the following:
 
 * [Android Studio](http://developer.android.com/sdk/index.html) version 1.0 or later.
-* [Java Development Kit (JDK) 7](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html).
+* [Java Development Kit (JDK) 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html).
 * An Office 365 account. You can sign up for [an Office 365 Developer subscription](http://aka.ms/o365-android-connect-signup) that includes the resources that you need to start building Office 365 apps.
 * A client id and redirect uri values of an application registered in Azure. The application must run the **Send mail as a user** permission:
 
