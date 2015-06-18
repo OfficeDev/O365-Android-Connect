@@ -60,6 +60,9 @@ This sample just shows the essentials that your apps need to work with Office 36
 * [Office 365 SDK for Android](http://aka.ms/o365-android-connect-sdk)
 * [Office Dev Center for Android](http://aka.ms/o365-android-connect-getstarted)
 * [Office 365 APIs starter projects and code samples](http://aka.ms/o365-android-connect-codesamples)
+* [Office 365 Code Snippets for Android](https://github.com/OfficeDev/O365-Android-Snippets)
+* [Office 365 APIs Starter Project for Android](https://github.com/OfficeDev/O365-Android-Start)
+* [Office 365 Profile sample for Android](https://github.com/OfficeDev/O365-Android-Profile)
 
 ## Copyright
 Copyright (c) 2015 Microsoft. All rights reserved.
