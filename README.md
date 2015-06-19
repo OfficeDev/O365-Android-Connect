@@ -20,10 +20,9 @@ To use the Office 365 Connect sample for Android you need the following:
 
 * [Android Studio](http://developer.android.com/sdk/index.html) version 1.0 or later.
 * [Java Development Kit (JDK) 7](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html).
-* An Office 365 account. You can sign up for [an Office 365 Developer subscription](http://aka.ms/o365-android-connect-signup) that includes the resources that you need to start building Office 365 apps.
-* A client id and redirect uri values of an application registered in Azure. The application must run the **Send mail as a user** permission:
-
-You can also [add a native client application in Azure](http://aka.ms/o365-android-connect-addapp) and [grant proper permissions](https://github.com/OfficeDev/O365-Android-Connect/wiki/Grant-permissions-to-the-Connect-application-in-Azure) to it.
+* An Office 365 account. You can sign up for [an Office 365 Developer subscription](https://portal.office.com/Signup/Signup.aspx?OfferId=6881A1CB-F4EB-4db3-9F18-388898DAF510&DL=DEVELOPERPACK&ali=1#0) that includes the resources that you need to start building Office 365 apps.
+     > Note: If you already have a subscription, the previous link sends you to a page that says *Sorry, you can’t add that to your current account*. In that case use an account from your current Office 365 subscription.
+* A client id and redirect uri values of an application registered in Azure. The application must run the **Send mail as a user** permission. You can also [add a native client application in Azure](https://msdn.microsoft.com/library/azure/dn132599.aspx#BKMK_Adding) and [grant proper permissions](https://github.com/OfficeDev/O365-Android-Connect/wiki/Grant-permissions-to-the-Connect-application-in-Azure) to it.
 
 ## Open the sample using Android Studio
 
@@ -56,10 +55,10 @@ This sample just shows the essentials that your apps need to work with Office 36
   
 ## Additional resources
 
-* [Office 365 APIs documentation](http://aka.ms/o365-android-connect-platformoverview)
-* [Office 365 SDK for Android](http://aka.ms/o365-android-connect-sdk)
-* [Office Dev Center for Android](http://aka.ms/o365-android-connect-getstarted)
-* [Office 365 APIs starter projects and code samples](http://aka.ms/o365-android-connect-codesamples)
+* [Office 365 APIs platform overview](https://msdn.microsoft.com/office/office365/howto/platform-development-overview)
+* [Office 365 SDK for Android](https://github.com/OfficeDev/Office-365-SDK-for-Android)
+* [Get started with Office 365 APIs in apps](https://msdn.microsoft.com/office/office365/howto/getting-started-Office-365-APIs)
+* [Office 365 APIs starter projects and code samples](https://msdn.microsoft.com/office/office365/howto/starter-projects-and-code-samples)
 * [Office 365 Code Snippets for Android](https://github.com/OfficeDev/O365-Android-Snippets)
 * [Office 365 APIs Starter Project for Android](https://github.com/OfficeDev/O365-Android-Start)
 * [Office 365 Profile sample for Android](https://github.com/OfficeDev/O365-Android-Profile)
