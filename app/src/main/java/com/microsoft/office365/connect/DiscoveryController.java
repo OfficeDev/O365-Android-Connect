@@ -74,7 +74,11 @@ public class DiscoveryController {
             DiscoveryClient discoveryClient = new DiscoveryClient(Constants.DISCOVERY_RESOURCE_URL, dependencyResolver);
 
             try {
-                ListenableFuture<List<ServiceInfo>> future = discoveryClient.getservices().read();
+                ListenableFuture<List<ServiceInfo>> future =
+                        discoveryClient
+                                .getservices()
+                                .select("serviceResourceId,serviceEndpointUri,capability")
+                                .read();
                 Futures.addCallback(future,
                         new FutureCallback<List<ServiceInfo>>() {
                             @Override
