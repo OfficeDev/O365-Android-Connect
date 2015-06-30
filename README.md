@@ -37,6 +37,8 @@ To use the Office 365 Connect sample for Android you need the following:
 	1. Close any projects that you might have open, then select **Open an existing Android Studio project**.
 	2. Browse to your local repository and select the O365-Android-Connect project. Click **OK**.
 	> Note: Android Studio might display a dialog asking if you want to use Gradle wrapper. Click **OK**.
+	> 
+	> Additionally, Android Studio shows a **Frameworks detected** notification if you don't have the **Android Support Repository** installed. Open the SDK manager and add the Android Support Repository to avoid the Frameworks detected notification.
 4. Open the Constants.java file.
 	1. Find the CLIENT\_ID constant and set its String value equal to the client id you registered in Azure Active Directory.
 	2. Find the REDIRECT\_URI constant and set its String value equal to the redirect URI you registered in Azure Active Directory.
