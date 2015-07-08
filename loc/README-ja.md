@@ -1,4 +1,7 @@
 # Android 用 Office 365 Connect のサンプル
+[![Build Status](https://travis-ci.org/OfficeDev/O365-Android-Connect.svg)](https://travis-ci.org/OfficeDev/O365-Android-Connect)
+
+[日本 (日本語)](/loc/README-ja.md) (日本語)
 
 [![Office 365 Connect のサンプル](../readme-images/O365-Android-Connect-video_play_icon.png)](https://www.youtube.com/watch?v=3IQIDFrqhY4 "稼働中のサンプルを確認するにはこちらをクリックしてください")
 
@@ -16,18 +19,26 @@ Connect のサンプルを実行するには、デバイスが次の要件を満
 Android 用 Office 365 Connect のサンプルを使用するには以下が必要です。
 
 * [Android Studio](http://developer.android.com/sdk/index.html) バージョン 1.0 以上。
-* Office 365 アカウント。Office 365 アプリのビルドを開始するために必要なリソースを含む [Office 365 Developer サブスクリプション](http://aka.ms/o365-android-connect-signup) にサイン アップできます。
-* Azure に登録されたアプリケーションのクライアント ID とリダイレクト URI の値。アプリケーションは、**ユーザーとしてメールを送信する**アクセス許可で実行する必要があります。
+* [Java 開発キット (JDK) 7](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html)。
+* Office 365 アカウント。[Office 365 Developer](https://portal.office.com/Signup/Signup.aspx?OfferId=6881A1CB-F4EB-4db3-9F18-388898DAF510&DL=DEVELOPERPACK&ali=1#0) サブスクリプションにサイン アップすることができます。ここには、Office 365 アプリのビルドを開始するために必要なリソースが含まれています。
 
-また、[Azure にネイティブ クライアント アプリケーションを追加](http://aka.ms/o365-android-connect-addapp)し、[適切なアクセス許可を付与](https://github.com/OfficeDev/O365-Android-Connect/wiki/Grant-permissions-to-the-Connect-application-in-Azure)することもできます。
+     > 注:サブスクリプションが既に存在する場合、上記のリンクをクリックすると、*申し訳ありません、現在のアカウントに追加できません* と表示されたページに移動します。その場合は、現在使用している Office 365 サブスクリプションのアカウントをご利用いただけます。
+* アプリケーションを登録する Microsoft Azure テナント。Azure Active Directory は、アプリケーションが認証と承認に使用する ID サービスを提供します。ここでは、試用版サブスクリプションを取得できます。[Microsoft Azure](https://account.windowsazure.com/SignUp)。
+
+     > 重要事項：Azure サブスクリプションが Office 365 テナントにバインドされていることを確認する必要があります。確認するには、Active Directory チームのブログ投稿「[複数の Windows Azure Active Directory を作成および管理する](http://blogs.technet.com/b/ad/archive/2013/11/08/creating-and-managing-multiple-windows-azure-active-directories.aspx)」を参照してください。「**新しいディレクトリを追加する**」セクションで、この方法について説明しています。また、詳細については、「[Office 365 開発環境をセットアップする](https://msdn.microsoft.com/office/office365/howto/setup-development-environment#bk_CreateAzureSubscription)」や「**Office 365 アカウントを Azure AD と関連付けてアプリを作成および管理する**」セクションも参照してください。
+      
+* Azure に登録されたアプリケーションのクライアント ID とリダイレクト URI の値。アプリケーションには、**[ユーザーとしてメールを送信する]** アクセス許可を付与する必要があります。[Azure にネイティブ クライアント アプリケーションを追加](https://msdn.microsoft.com/library/azure/dn132599.aspx#BKMK_Adding)し、[適切なアクセス許可を付与](https://github.com/OfficeDev/O365-Android-Connect/wiki/Grant-permissions-to-the-Connect-application-in-Azure)します。
 
 ## Android Studio を使用してサンプルを開く
 
 1. developer.android.com の[指示](http://developer.android.com/sdk/installing/adding-packages.html)に従って、[Android Studio](http://developer.android.com/tools/studio/index.html#install-updates) をインストールし、Android SDK パッケージを追加します。
 2. このサンプルをダウンロードするか、クローンを作成します。
 3. Android Studio を起動します。
-	1. **[既存の Android Studio プロジェクトを開く]** を選択します。
+	1. 開いているプロジェクトをすべて閉じ、 **[既存のAndroid Studio プロジェクトを開く]** を選択します。
 	2. ローカル リポジトリを参照し、O365-Android-Connect プロジェクトを選択します。**[OK]** をクリックします。
+	> 注:Android Studio は、Gradle ラッパーを使用するかどうかを尋ねるダイアログを表示する場合があります。**[OK]** をクリックします。
+	>  
+	> また、**Android サポート リポジトリ**がインストールされていない場合、Android Studio は**フレームワーク検出**の通知を表示します。フレームワーク検出の通知が表示されないようにするには、SDK マネージャーを開き、Android サポート リポジトリを追加してください。
 4. Constants.java ファイルを開きます。
 	1. CLIENT\_ID 定数を検索して、その String 値を Azure Active Directory に登録されているクライアント ID と同じ値に設定します。
 	2. REDIRECT\_URI 定数を検索して、その String 値を Azure Active Directory に登録されているリダイレクト URI と同じ値に設定します。
@@ -35,16 +46,15 @@ Android 用 Office 365 Connect のサンプルを使用するには以下が必�
 
     > 注:CLIENT\_ID と REDIRECT\_URI の値がない場合は、[ネイティブ クライアント アプリケーションを Azure に追加](https://msdn.microsoft.com/library/azure/dn132599.aspx#BKMK_Adding)し、CLIENT\_ID と REDIRECT_URI を書き留めます。
 
-Connect のサンプルをビルドしたら、エミュレーターまたはデバイス上で実行できます。
+Connect のサンプルをビルドしたら、エミュレーターまたはデバイス上で実行できます。**[デバイスの選択]** ダイアログから API レベル 15 以上のデバイスを選択してください。
 
-サンプルの詳細について確認する場合は、Wiki ページ「[コードを理解する](https://github.com/OfficeDev/O365-Android-Connect/wiki/Understanding-the-Connect-sample-code)」にアクセスしてください。
+サンプルの詳細については、Wiki ページ[コードを理解する](https://github.com/OfficeDev/O365-Android-Connect/wiki/Understanding-the-Connect-sample-code)にアクセスしてください。このコード サンプルをアプリで使用する場合は、「[O365 Android Connect サンプル コードをアプリで使用する](https://github.com/OfficeDev/O365-Android-Connect/wiki/Using-the-O365-Android-Connect-sample-code-in-your-app)」にアクセスしてください。
 
 ## 質問とコメント
 
-この Android 用 Connect サンプルについて、Microsoft にフィードバックをお寄せください。質問やご提案を送信する方法は次のとおりです。
+O365 Android Connect プロジェクトについて、Microsoft にフィードバックをお寄せください。質問や提案につきましては、このリポジトリの「[問題](https://github.com/OfficeDev/O365-Android-Connect/issues)」セクションに送信できます。
 
-* このリポジトリの「[問題](https://github.com/OfficeDev/O365-Android-Connect/issues)」セクション。
-* [docthis@microsoft.com](mailto:docthis@microsoft.com?subject=Feedback%20on%20the%20Office%20365%20Connect%20sample%20for%20Android) への電子メールの送信。
+Office 365 開発全般の質問につきましては、「[スタック オーバーフロー](http://stackoverflow.com/questions/tagged/Office365+API)」に投稿してください。質問またはコメントには、必ず [Office365] および [API] のタグを付けてください。
 
 ## 次の手順
 
@@ -52,11 +62,13 @@ Connect のサンプルをビルドしたら、エミュレーターまたはデ
   
 ## その他の技術情報
 
-* [Office 365 API ドキュメント](http://aka.ms/o365-android-connect-platformoverview)
-* [Office 365 SDK for Android](http://aka.ms/o365-android-connect-sdk)
-* [Android 用 Office デベロッパー センター](http://aka.ms/o365-android-connect-getstarted)
-* [Office 365 API スタート プロジェクトおよびサンプル コード](http://aka.ms/o365-android-connect-codesamples)
+* [Office 365 API プラットフォームの概要](https://msdn.microsoft.com/office/office365/howto/platform-development-overview)
+* [Office 365 SDK for Android](https://github.com/OfficeDev/Office-365-SDK-for-Android)
+* [アプリで Office 365 API の使用を開始する](https://msdn.microsoft.com/office/office365/howto/getting-started-Office-365-APIs)
+* [Office 365 API スタート プロジェクトおよびサンプル コード](https://msdn.microsoft.com/office/office365/howto/starter-projects-and-code-samples)
+* [Android 用 Office 365 コード スニペット](https://github.com/OfficeDev/O365-Android-Snippets)
+* [Android 版 Office 365 API スタート プロジェクト](https://github.com/OfficeDev/O365-Android-Start)
+* [Android 用 Office 365 プロファイル サンプル](https://github.com/OfficeDev/O365-Android-Profile)
 
 ## 著作権
 Copyright (c) 2015 Microsoft.All rights reserved.
-
