@@ -15,6 +15,7 @@ import com.microsoft.services.odata.impl.ADALDependencyResolver;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Handles the discovery of the service endpoints
@@ -37,34 +38,28 @@ public class DiscoveryManager {
     private static DiscoveryManager INSTANCE;
 
     /**
-     * Provides information about the service that corresponds to the provided
-     * capability.
+     * Provides information about the service that corresponds to the provided capability.
      * @param capability A string that contains the capability of the service that
      *                   is going to be discovered.
-     * @return A signal to wait on before continuing execution. The signal contains the
-     * ServiceInfo object with extra information about discovered service.
+     * @return The ServiceInfo object with extra information about discovered service.
+     * @throws InterruptedException
+     * @throws ExecutionException
      */
-    public SettableFuture<ServiceInfo> getServiceInfo(final String capability) {
-
-        final SettableFuture<ServiceInfo> result = SettableFuture.create();
-
+    public ServiceInfo getServiceInfo(final String capability) throws InterruptedException, ExecutionException {
         // First, look in the locally cached services.
         if(mServices != null) {
-            boolean serviceFound = false;
             for (ServiceInfo service : mServices) {
                 if (service.getcapability().equals(capability)) {
                     Log.i(TAG, "getServiceInfo - " + service.getserviceName() + " service for " + capability + " was found in local cached services");
-                    result.set(service);
-                    serviceFound = true;
-                    break;
+                    return service;
                 }
             }
 
-            if(!serviceFound) {
-                NoSuchElementException noSuchElementException = new NoSuchElementException("The " + capability + " capability was not found in the local cached services.");
-                Log.e(TAG, "getServiceInfo - " + noSuchElementException.getMessage());
-                result.setException(noSuchElementException);
-            }
+            // We already cached the services but couldn't find the requested service in local cache
+            NoSuchElementException noSuchElementException = new NoSuchElementException("The " + capability + " capability was not found in the local cached services.");
+            Log.e(TAG, "getServiceInfo - " + noSuchElementException.getMessage());
+            throw noSuchElementException;
+
         } else { // The services have not been cached yet. Go ask the discovery service.
             AuthenticationManager.getInstance().setResourceId(Constants.DISCOVERY_RESOURCE_ID);
             ADALDependencyResolver dependencyResolver = (ADALDependencyResolver) AuthenticationManager
@@ -73,49 +68,28 @@ public class DiscoveryManager {
 
             DiscoveryClient discoveryClient = new DiscoveryClient(Constants.DISCOVERY_RESOURCE_URL, dependencyResolver);
 
-            try {
-                ListenableFuture<List<ServiceInfo>> future =
-                        discoveryClient
-                                .getservices()
-                                .select("serviceResourceId,serviceEndpointUri,capability")
-                                .read();
-                Futures.addCallback(future,
-                        new FutureCallback<List<ServiceInfo>>() {
-                            @Override
-                            public void onSuccess(final List<ServiceInfo> services) {
-                                Log.i(TAG, "getServiceInfo - Services discovered\n");
-                                // Save the discovered services to serve further requests from the local cache.
-                                mServices = services;
+            List<ServiceInfo> services =
+                    discoveryClient
+                            .getservices()
+                            .select("serviceResourceId,serviceEndpointUri,capability")
+                            .read().get();
 
-                                boolean serviceFound = false;
-                                for (ServiceInfo service : services) {
-                                    if (service.getcapability().equals(capability)) {
-                                        Log.i(TAG, "getServiceInfo - " + service.getserviceName() + " service for " + capability + " was found in services retrieved from discovery");
-                                        result.set(service);
-                                        serviceFound = true;
-                                        break;
-                                    }
-                                }
+            Log.i(TAG, "getServiceInfo - Services discovered\n");
+            // Save the discovered services to serve further requests from the local cache.
+            mServices = services;
 
-                                if(!serviceFound) {
-                                    NoSuchElementException noSuchElementException = new NoSuchElementException("The " + capability + " capability was not found in the user services.");
-                                    Log.e(TAG, "getServiceInfo - " + noSuchElementException.getMessage());
-                                    result.setException(noSuchElementException);
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(Throwable t) {
-                                Log.e(TAG, "getServiceInfo - " + t.getMessage());
-                                result.setException(t);
-                            }
-                        });
-            } catch (Exception e) {
-                Log.e(TAG, "getServiceInfo - " + e.getMessage());
-                result.setException(e);
+            for (ServiceInfo service : services) {
+                if (service.getcapability().equals(capability)) {
+                    Log.i(TAG, "getServiceInfo - " + service.getserviceName() + " service for " + capability + " was found in services retrieved from discovery");
+                    return service;
+                }
             }
+
+            // We haven't cached the services but couldn't find the requested service in discovery service
+            NoSuchElementException noSuchElementException = new NoSuchElementException("The " + capability + " capability was not found in the user services.");
+            Log.e(TAG, "getServiceInfo - " + noSuchElementException.getMessage());
+            throw noSuchElementException;
         }
-        return result;
     }
 }
 

@@ -69,7 +69,7 @@ public class SendMailActivity extends AppCompatActivity {
                     // we can call this method synchronously without blocking the UI
                     ServiceInfo serviceInfo = DiscoveryManager
                             .getInstance()
-                            .getServiceInfo(Constants.MAIL_CAPABILITY).get();
+                            .getServiceInfo(Constants.MAIL_CAPABILITY);
                     Log.i(TAG, "discoverMailService - Mail service discovered");
 
                     // Initialize MailManager with ResourceID and ServiceEndpointURI
