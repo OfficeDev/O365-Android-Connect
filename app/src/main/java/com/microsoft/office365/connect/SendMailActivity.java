@@ -62,35 +62,38 @@ public class SendMailActivity extends AppCompatActivity {
     public void discoverMailService(){
         resetUIForDiscoverMailService();
 
-        new Thread(new Runnable() {
-            public void run() {
-                try {
-                    // Since we are no longer on the UI thread,
-                    // we can call this method synchronously without blocking the UI
-                    ServiceInfo serviceInfo = DiscoveryManager
-                            .getInstance()
-                            .getServiceInfo(Constants.MAIL_CAPABILITY);
-                    Log.i(TAG, "discoverMailService - Mail service discovered");
+        // DiscoveryManager does its job in a worker thread
+        // we can just call getServiceInfo
+        DiscoveryManager
+                .getInstance()
+                .getServiceInfo(Constants.MAIL_CAPABILITY,
+                        new OperationCallback<ServiceInfo>() {
+                            @Override
+                            public void onSuccess(final ServiceInfo serviceInfo) {
+                                Log.i(TAG, "discoverMailService - Mail service discovered");
 
-                    // Initialize MailManager with ResourceID and ServiceEndpointURI
-                    MailManager
-                            .getInstance()
-                            .setServiceResourceId(
-                                    serviceInfo.getserviceResourceId()
-                            );
-                    MailManager
-                            .getInstance()
-                            .setServiceEndpointUri(
-                                    serviceInfo.getserviceEndpointUri()
-                            );
+                                // Initialize MailManager with ResourceID and ServiceEndpointURI
+                                MailManager
+                                        .getInstance()
+                                        .setServiceResourceId(
+                                                serviceInfo.getserviceResourceId()
+                                        );
+                                MailManager
+                                        .getInstance()
+                                        .setServiceEndpointUri(
+                                                serviceInfo.getserviceEndpointUri()
+                                        );
 
-                    showDiscoverSuccessUI();
-                } catch (InterruptedException | ExecutionException e) {
-                    Log.e(TAG, "discoverMailService - " + e.getMessage());
-                    showDiscoverErrorUI();
-                }
-            }
-        }).start();
+                                showDiscoverSuccessUI();
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                Log.e(TAG, "discoverMailService - " + e.getMessage());
+                                showDiscoverErrorUI();
+                            }
+                        }
+                );
     }
 
     /**
