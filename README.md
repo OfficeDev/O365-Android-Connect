@@ -39,9 +39,9 @@ To use the Office 365 Connect sample for Android you need the following:
 	> Note: Android Studio might display a dialog asking if you want to use Gradle wrapper. Click **OK**.
 	> 
 	> Additionally, Android Studio shows a **Frameworks detected** notification if you don't have the **Android Support Repository** installed. Open the SDK manager and add the Android Support Repository to avoid the Frameworks detected notification.
-4. Open the Constants.java file.
-	1. Find the CLIENT\_ID constant and set its String value equal to the client id you registered in Azure Active Directory.
-	2. Find the REDIRECT\_URI constant and set its String value equal to the redirect URI you registered in Azure Active Directory.
+4. Open the [```Constants.java```](app/src/main/java/com/microsoft/office365/connect/Constants.java) file.
+	1. Find the [```CLIENT_ID```](app/src/main/java/com/microsoft/office365/connect/Constants.java#L12) constant and set its String value equal to the client id you registered in Azure Active Directory.
+	2. Find the [```REDIRECT_URI```](/app/src/main/java/com/microsoft/office365/connect/Constants.java#L13) constant and set its String value equal to the redirect URI you registered in Azure Active Directory.
     ![Office 365 Connect sample](/readme-images/O365-Android-Connect-Constants.png "Client ID and Redirect URI values in Constants file")
 
     > Note: If you have don't have CLIENT\_ID and REDIRECT\_URI values, [add a native client application in Azure](https://msdn.microsoft.com/library/azure/dn132599.aspx#BKMK_Adding) and take note of the CLIENT\_ID and REDIRECT_URI.
