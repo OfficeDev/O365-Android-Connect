@@ -48,54 +48,52 @@ public class SendMailActivity extends AppCompatActivity {
 
         initializeViews();
 
-        discoverMailService();
-
         // Extract the givenName and displayableId and use it in the UI.
         mTitleTextView.append(getIntent()
                 .getStringExtra("givenName") + "!");
         mEmailEditText.setText(getIntent()
                 .getStringExtra("displayableId"));
+
+        // We don't need to wait for user input to discover the mail service,
+        // so we just do it
+        discoverMailService();
     }
 
     /**
      * It locates the service endpoints for the mail service using the DiscoveryManager class.
      */
     public void discoverMailService(){
-        final SettableFuture<ServiceInfo> serviceDiscovered;
-
         resetUIForDiscoverMailService();
 
-        serviceDiscovered = DiscoveryManager
-                .getInstance()
-                .getServiceInfo(Constants.MAIL_CAPABILITY);
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    // Since we are no longer on the UI thread,
+                    // we can call this method synchronously without blocking the UI
+                    ServiceInfo serviceInfo = DiscoveryManager
+                            .getInstance()
+                            .getServiceInfo(Constants.MAIL_CAPABILITY).get();
+                    Log.i(TAG, "discoverMailService - Mail service discovered");
 
-        Futures.addCallback(serviceDiscovered,
-                new FutureCallback<ServiceInfo>() {
-                    @Override
-                    public void onSuccess(ServiceInfo serviceInfo) {
-                        Log.i(TAG, "discoverMailService - Mail service discovered");
+                    // Initialize MailController with ResourceID and ServiceEndpointURI
+                    MailController
+                            .getInstance()
+                            .setServiceResourceId(
+                                    serviceInfo.getserviceResourceId()
+                            );
+                    MailController
+                            .getInstance()
+                            .setServiceEndpointUri(
+                                    serviceInfo.getserviceEndpointUri()
+                            );
 
-                        // Initialize MailController with ResourceID and ServiceEndpointURI
-                        MailController
-                                .getInstance()
-                                .setServiceResourceId(
-                                        serviceInfo.getserviceResourceId()
-                                );
-                        MailController
-                                .getInstance()
-                                .setServiceEndpointUri(
-                                        serviceInfo.getserviceEndpointUri()
-                                );
-
-                        showDiscoverSuccessUI();
-                    }
-
-                    @Override
-                    public void onFailure(final Throwable t) {
-                        Log.e(TAG, "discoverMailService - " + t.getMessage());
-                        showDiscoverErrorUI();
-                    }
-                });
+                    showDiscoverSuccessUI();
+                } catch (InterruptedException | ExecutionException e) {
+                    Log.e(TAG, "discoverMailService - " + e.getMessage());
+                    showDiscoverErrorUI();
+                }
+            }
+        }).start();
     }
 
     /**
@@ -105,8 +103,6 @@ public class SendMailActivity extends AppCompatActivity {
      * @param v
      */
     public void onSendMailButtonClick(View v){
-        final SettableFuture<ServiceInfo> serviceDiscovered;
-
         resetUIForSendMail();
 
         new Thread(new Runnable() {
