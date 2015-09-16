@@ -57,7 +57,7 @@ public class SendMailActivity extends AppCompatActivity {
     }
 
     /**
-     * It locates the service endpoints for the mail service using the DiscoveryManager class.
+     * Locates the service endpoints for the mail service using the DiscoveryManager class.
      */
     public void discoverMailService(){
         resetUIForDiscoverMailService();
@@ -105,27 +105,29 @@ public class SendMailActivity extends AppCompatActivity {
     public void onSendMailButtonClick(View v){
         resetUIForSendMail();
 
-        new Thread(new Runnable() {
-            public void run() {
-                try {
-                    // Since we are no longer on the UI thread,
-                    // we can call this method synchronously without blocking the UI
-                    Integer mailId = MailManager.getInstance().sendMail(
-                            mEmailEditText.getText().toString(),
-                            getResources().getString(R.string.mail_subject_text),
-                            MessageFormat.format(
-                                    getResources().getString(R.string.mail_body_text),
-                                    getIntent().getStringExtra("givenName")
-                            )
-                    );
-                    Log.i(TAG, "onSendMailButtonClick - Mail sent");
-                    showSendMailSuccessUI();
-                } catch (InterruptedException | ExecutionException e) {
-                    Log.e(TAG, "onSendMailButtonClick - " + e.getMessage());
-                    showSendMailErrorUI();
+        // MailManager does its job in a worker thread
+        // we can just call sendMail
+        MailManager.getInstance().sendMail(
+                mEmailEditText.getText().toString(),
+                getResources().getString(R.string.mail_subject_text),
+                MessageFormat.format(
+                        getResources().getString(R.string.mail_body_text),
+                        getIntent().getStringExtra("givenName")
+                ),
+                new OperationCallback<Integer>() {
+                    @Override
+                    public void onSuccess(Integer result) {
+                        Log.i(TAG, "onSendMailButtonClick - Mail sent");
+                        showSendMailSuccessUI();
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        Log.e(TAG, "onSendMailButtonClick - " + e.getMessage());
+                        showSendMailErrorUI();
+                    }
                 }
-            }
-        }).start();
+        );
     }
 
     @Override

@@ -70,13 +70,15 @@ public class MailManager {
 
     /**
      * Sends an email message using the Office 365 mail capability from the address of the
-     * signed in user.
+     * signed in user. You need to initialize the MailManager by calling
+     * - {@link MailManager#setServiceResourceId(String)}
+     * - {@link MailManager#setServiceEndpointUri(String)}
      * @param emailAddress The recipient email address.
      * @param subject The subject to use in the mail message.
      * @param body The body of the message.
-     * @return The id of the message sent.
+     * @param operationCallback The callback to which return the result or error.
      */
-    public Integer sendMail(final String emailAddress, final String subject, final String body) throws InterruptedException, ExecutionException {
+    public void sendMail(final String emailAddress, final String subject, final String body, final OperationCallback<Integer> operationCallback) {
 
         if(!isReady()){
             throw new MissingResourceException(
@@ -86,39 +88,50 @@ public class MailManager {
             );
         }
 
-        AuthenticationManager.getInstance().setResourceId(mServiceResourceId);
-        ADALDependencyResolver dependencyResolver = (ADALDependencyResolver) AuthenticationManager
-                .getInstance()
-                .getDependencyResolver();
+        // Since we're doing considerable work, let's get out of the main thread
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    AuthenticationManager.getInstance().setResourceId(mServiceResourceId);
+                    ADALDependencyResolver dependencyResolver = (ADALDependencyResolver) AuthenticationManager
+                            .getInstance()
+                            .getDependencyResolver();
 
-        OutlookClient mailClient = new OutlookClient(mServiceEndpointUri, dependencyResolver);
+                    OutlookClient mailClient = new OutlookClient(mServiceEndpointUri, dependencyResolver);
 
-        // Prepare the message.
-        List<Recipient> recipientList = new ArrayList<>();
+                    // Prepare the message.
+                    List<Recipient> recipientList = new ArrayList<>();
 
-        Recipient recipient = new Recipient();
-        EmailAddress email = new EmailAddress();
-        email.setAddress(emailAddress);
-        recipient.setEmailAddress(email);
-        recipientList.add(recipient);
+                    Recipient recipient = new Recipient();
+                    EmailAddress email = new EmailAddress();
+                    email.setAddress(emailAddress);
+                    recipient.setEmailAddress(email);
+                    recipientList.add(recipient);
 
-        Message messageToSend = new Message();
-        messageToSend.setToRecipients(recipientList);
+                    Message messageToSend = new Message();
+                    messageToSend.setToRecipients(recipientList);
 
-        ItemBody bodyItem = new ItemBody();
-        bodyItem.setContentType(BodyType.HTML);
-        bodyItem.setContent(body);
-        messageToSend.setBody(bodyItem);
-        messageToSend.setSubject(subject);
+                    ItemBody bodyItem = new ItemBody();
+                    bodyItem.setContentType(BodyType.HTML);
+                    bodyItem.setContent(body);
+                    messageToSend.setBody(bodyItem);
+                    messageToSend.setSubject(subject);
 
-        // Contact the Office 365 service and deliver the message.
-        Integer mailId = mailClient
-                .getMe()
-                .getOperations()
-                .sendMail(messageToSend, true).get();
+                    // Contact the Office 365 service and deliver the message.
+                    Integer mailId = mailClient
+                            .getMe()
+                            .getOperations()
+                            .sendMail(messageToSend, true).get();
 
-        Log.i(TAG, "sendMail - Email with ID: " + mailId + "sent");
-        return mailId;
+                    Log.i(TAG, "sendMail - Email with ID: " + mailId + "sent");
+                    operationCallback.onSuccess(mailId);
+                } catch (InterruptedException | ExecutionException e) {
+                    Log.e(TAG, "sendMail - " + e.getMessage());
+                    operationCallback.onError(e);
+                }
+            }
+        }).start();
     }
 }
 
