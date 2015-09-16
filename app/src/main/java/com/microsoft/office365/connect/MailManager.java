@@ -27,21 +27,21 @@ import java.util.MissingResourceException;
  * connected to Office 365 and discovered the mail service
  * endpoints before using the sendMail method.
  */
-public class MailController {
+public class MailManager {
 
-    private static final String TAG = "MailController";
+    private static final String TAG = "MailManager";
 
     private String mServiceResourceId;
     private String mServiceEndpointUri;
 
-    public static synchronized MailController getInstance() {
+    public static synchronized MailManager getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new MailController();
+            INSTANCE = new MailManager();
         }
         return INSTANCE;
     }
 
-    private static MailController INSTANCE;
+    private static MailManager INSTANCE;
 
     /**
      * Store the service resource id from the discovered service.
@@ -81,7 +81,7 @@ public class MailController {
         if(!isReady()){
             throw new MissingResourceException(
                     "You must set the ServiceResourceId and ServiceEndPointUri before using sendMail",
-                    "MailController",
+                    "MailManager",
                     "ServiceResourceId, ServiceEndPointUri"
             );
         }
