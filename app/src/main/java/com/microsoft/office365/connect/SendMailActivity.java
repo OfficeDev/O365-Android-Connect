@@ -27,7 +27,7 @@ import java.util.concurrent.ExecutionException;
 /**
  * This activity handles the send mail operation of the app.
  * The app must be connected to Office 365 before this activity can send an email.
- * The activity uses the DiscoveryController class to get the service endpoint. It also
+ * The activity uses the DiscoveryManager class to get the service endpoint. It also
  * uses the MailController to send the message.
  */
 public class SendMailActivity extends AppCompatActivity {
@@ -57,7 +57,7 @@ public class SendMailActivity extends AppCompatActivity {
 
     /**
      * Handler for the onclick event of the send mail button. It locates the service endpoints
-     * for the mail service using the DiscoveryController class. It also uses the MailController
+     * for the mail service using the DiscoveryManager class. It also uses the MailController
      * class to send an email to the address stored in the mEmailEditText view.
      * The subject and body of the message is stored in the strings.xml file.
      * @param v
@@ -67,7 +67,7 @@ public class SendMailActivity extends AppCompatActivity {
 
         resetUIForSendMail();
 
-        serviceDiscovered = DiscoveryController
+        serviceDiscovered = DiscoveryManager
                 .getInstance()
                 .getServiceInfo(Constants.MAIL_CAPABILITY);
 

@@ -21,20 +21,20 @@ import java.util.NoSuchElementException;
  * for the capabilities that the user has access to
  * in Office 365.
  */
-public class DiscoveryController {
+public class DiscoveryManager {
 
-    private static final String TAG = "DiscoveryController";
+    private static final String TAG = "DiscoveryManager";
 
     private List<ServiceInfo> mServices;
 
-    public static synchronized DiscoveryController getInstance() {
+    public static synchronized DiscoveryManager getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new DiscoveryController();
+            INSTANCE = new DiscoveryManager();
         }
         return INSTANCE;
     }
 
-    private static DiscoveryController INSTANCE;
+    private static DiscoveryManager INSTANCE;
 
     /**
      * Provides information about the service that corresponds to the provided
