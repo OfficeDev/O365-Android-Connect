@@ -48,6 +48,8 @@ public class SendMailActivity extends AppCompatActivity {
 
         initializeViews();
 
+        discoverMailService();
+
         // Extract the givenName and displayableId and use it in the UI.
         mTitleTextView.append(getIntent()
                 .getStringExtra("givenName") + "!");
@@ -56,16 +58,12 @@ public class SendMailActivity extends AppCompatActivity {
     }
 
     /**
-     * Handler for the onclick event of the send mail button. It locates the service endpoints
-     * for the mail service using the DiscoveryManager class. It also uses the MailController
-     * class to send an email to the address stored in the mEmailEditText view.
-     * The subject and body of the message is stored in the strings.xml file.
-     * @param v
+     * It locates the service endpoints for the mail service using the DiscoveryManager class.
      */
-    public void onSendMailButtonClick(View v){
+    public void discoverMailService(){
         final SettableFuture<ServiceInfo> serviceDiscovered;
 
-        resetUIForSendMail();
+        resetUIForDiscoverMailService();
 
         serviceDiscovered = DiscoveryManager
                 .getInstance()
@@ -75,9 +73,9 @@ public class SendMailActivity extends AppCompatActivity {
                 new FutureCallback<ServiceInfo>() {
                     @Override
                     public void onSuccess(ServiceInfo serviceInfo) {
-                        Log.i(TAG, "onSendMailButtonClick - Mail service discovered");
-                        showDiscoverSuccessUI();
+                        Log.i(TAG, "discoverMailService - Mail service discovered");
 
+                        // Initialize MailController with ResourceID and ServiceEndpointURI
                         MailController
                                 .getInstance()
                                 .setServiceResourceId(
@@ -89,31 +87,49 @@ public class SendMailActivity extends AppCompatActivity {
                                         serviceInfo.getserviceEndpointUri()
                                 );
 
-                        try {
-                            // Since we are no longer on the UI thread,
-                            // we can call this method synchronously without blocking the UI
-                            Boolean mailSent = MailController.getInstance().sendMail(
-                                    mEmailEditText.getText().toString(),
-                                    getResources().getString(R.string.mail_subject_text),
-                                    MessageFormat.format(
-                                            getResources().getString(R.string.mail_body_text),
-                                            getIntent().getStringExtra("givenName")
-                                    )
-                            ).get();
-                            Log.i(TAG, "sendMailToRecipient - Mail sent");
-                            showSendMailSuccessUI();
-                        } catch (InterruptedException | ExecutionException e) {
-                            Log.e(TAG, "onSendMailButtonClick - " + e.getMessage());
-                            showSendMailErrorUI();
-                        }
+                        showDiscoverSuccessUI();
                     }
 
                     @Override
                     public void onFailure(final Throwable t) {
-                        Log.e(TAG, "onSendMailButtonClick - " + t.getMessage());
+                        Log.e(TAG, "discoverMailService - " + t.getMessage());
                         showDiscoverErrorUI();
                     }
                 });
+    }
+
+    /**
+     * Handler for the onclick event of the send mail button. It uses the MailController
+     * class to send an email to the address stored in the mEmailEditText view.
+     * The subject and body of the message is stored in the strings.xml file.
+     * @param v
+     */
+    public void onSendMailButtonClick(View v){
+        final SettableFuture<ServiceInfo> serviceDiscovered;
+
+        resetUIForSendMail();
+
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    // Since we are no longer on the UI thread,
+                    // we can call this method synchronously without blocking the UI
+                    Boolean mailSent = MailController.getInstance().sendMail(
+                            mEmailEditText.getText().toString(),
+                            getResources().getString(R.string.mail_subject_text),
+                            MessageFormat.format(
+                                    getResources().getString(R.string.mail_body_text),
+                                    getIntent().getStringExtra("givenName")
+                            )
+                    ).get();
+                    Log.i(TAG, "sendMailToRecipient - Mail sent");
+                    showSendMailSuccessUI();
+                } catch (InterruptedException | ExecutionException e) {
+                    Log.e(TAG, "onSendMailButtonClick - " + e.getMessage());
+                    showSendMailErrorUI();
+                }
+            }
+        }).start();
     }
 
     @Override
@@ -155,6 +171,12 @@ public class SendMailActivity extends AppCompatActivity {
         mConclusionTextView = (TextView)findViewById(R.id.conclusionTextView);
     }
 
+    private void resetUIForDiscoverMailService(){
+        mSendMailButton.setVisibility(View.GONE);
+        mConclusionTextView.setVisibility(View.GONE);
+        mSendMailProgressBar.setVisibility(View.VISIBLE);
+    }
+
     private void resetUIForSendMail(){
         mSendMailButton.setVisibility(View.GONE);
         mConclusionTextView.setVisibility(View.GONE);
@@ -164,26 +186,14 @@ public class SendMailActivity extends AppCompatActivity {
     private void showDiscoverSuccessUI(){
         runOnUiThread(new Runnable() {
             @Override
-            public void run(){
+            public void run() {
+                // Now that we have discovered the mail service, show the send mail button
+                mSendMailButton.setVisibility(View.VISIBLE);
+                mSendMailProgressBar.setVisibility(View.GONE);
+
                 Toast.makeText(
                         SendMailActivity.this,
                         R.string.discover_toast_text,
-                        Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void showSendMailSuccessUI(){
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run(){
-                mSendMailProgressBar.setVisibility(View.GONE);
-                mSendMailButton.setVisibility(View.VISIBLE);
-                mConclusionTextView.setText(R.string.conclusion_text);
-                mConclusionTextView.setVisibility(View.VISIBLE);
-                Toast.makeText(
-                        SendMailActivity.this,
-                        R.string.send_mail_toast_text,
                         Toast.LENGTH_SHORT).show();
             }
         });
@@ -201,6 +211,22 @@ public class SendMailActivity extends AppCompatActivity {
                         SendMailActivity.this,
                         R.string.discover_toast_text_error,
                         Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void showSendMailSuccessUI(){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run(){
+                mSendMailProgressBar.setVisibility(View.GONE);
+                mSendMailButton.setVisibility(View.VISIBLE);
+                mConclusionTextView.setText(R.string.conclusion_text);
+                mConclusionTextView.setVisibility(View.VISIBLE);
+                Toast.makeText(
+                        SendMailActivity.this,
+                        R.string.send_mail_toast_text,
+                        Toast.LENGTH_SHORT).show();
             }
         });
     }
