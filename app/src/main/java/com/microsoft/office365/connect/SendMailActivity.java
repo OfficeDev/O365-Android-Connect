@@ -107,15 +107,15 @@ public class SendMailActivity extends AppCompatActivity {
                 try {
                     // Since we are no longer on the UI thread,
                     // we can call this method synchronously without blocking the UI
-                    Boolean mailSent = MailManager.getInstance().sendMail(
+                    Integer mailId = MailManager.getInstance().sendMail(
                             mEmailEditText.getText().toString(),
                             getResources().getString(R.string.mail_subject_text),
                             MessageFormat.format(
                                     getResources().getString(R.string.mail_body_text),
                                     getIntent().getStringExtra("givenName")
                             )
-                    ).get();
-                    Log.i(TAG, "sendMailToRecipient - Mail sent");
+                    );
+                    Log.i(TAG, "onSendMailButtonClick - Mail sent");
                     showSendMailSuccessUI();
                 } catch (InterruptedException | ExecutionException e) {
                     Log.e(TAG, "onSendMailButtonClick - " + e.getMessage());

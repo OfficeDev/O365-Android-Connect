@@ -20,6 +20,7 @@ import com.microsoft.services.odata.impl.ADALDependencyResolver;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.MissingResourceException;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Handles the creation of the message and contacting the
@@ -73,10 +74,9 @@ public class MailManager {
      * @param emailAddress The recipient email address.
      * @param subject The subject to use in the mail message.
      * @param body The body of the message.
-     * @return A signal to wait on before continuing execution. The signal contains
-     * a boolean value of true if the operation was successful.
+     * @return The id of the message sent.
      */
-    public SettableFuture<Boolean> sendMail(final String emailAddress, final String subject, final String body) {
+    public Integer sendMail(final String emailAddress, final String subject, final String body) throws InterruptedException, ExecutionException {
 
         if(!isReady()){
             throw new MissingResourceException(
@@ -86,58 +86,39 @@ public class MailManager {
             );
         }
 
-        final SettableFuture<Boolean> result = SettableFuture.create();
+        AuthenticationManager.getInstance().setResourceId(mServiceResourceId);
+        ADALDependencyResolver dependencyResolver = (ADALDependencyResolver) AuthenticationManager
+                .getInstance()
+                .getDependencyResolver();
 
-        try {
-            AuthenticationManager.getInstance().setResourceId(mServiceResourceId);
-            ADALDependencyResolver dependencyResolver = (ADALDependencyResolver) AuthenticationManager
-                    .getInstance()
-                    .getDependencyResolver();
+        OutlookClient mailClient = new OutlookClient(mServiceEndpointUri, dependencyResolver);
 
-            OutlookClient mailClient = new OutlookClient(mServiceEndpointUri, dependencyResolver);
+        // Prepare the message.
+        List<Recipient> recipientList = new ArrayList<>();
 
-            // Prepare the message.
-            List<Recipient> recipientList = new ArrayList<>();
+        Recipient recipient = new Recipient();
+        EmailAddress email = new EmailAddress();
+        email.setAddress(emailAddress);
+        recipient.setEmailAddress(email);
+        recipientList.add(recipient);
 
-            Recipient recipient = new Recipient();
-            EmailAddress email = new EmailAddress();
-            email.setAddress(emailAddress);
-            recipient.setEmailAddress(email);
-            recipientList.add(recipient);
+        Message messageToSend = new Message();
+        messageToSend.setToRecipients(recipientList);
 
-            Message messageToSend = new Message();
-            messageToSend.setToRecipients(recipientList);
+        ItemBody bodyItem = new ItemBody();
+        bodyItem.setContentType(BodyType.HTML);
+        bodyItem.setContent(body);
+        messageToSend.setBody(bodyItem);
+        messageToSend.setSubject(subject);
 
-            ItemBody bodyItem = new ItemBody();
-            bodyItem.setContentType(BodyType.HTML);
-            bodyItem.setContent(body);
-            messageToSend.setBody(bodyItem);
-            messageToSend.setSubject(subject);
+        // Contact the Office 365 service and deliver the message.
+        Integer mailId = mailClient
+                .getMe()
+                .getOperations()
+                .sendMail(messageToSend, true).get();
 
-            // Contact the Office 365 service and try to deliver the message.
-            ListenableFuture<Integer> mailSent = mailClient
-                    .getMe()
-                    .getOperations()
-                    .sendMail(messageToSend, true);
-            Futures.addCallback(mailSent,
-                    new FutureCallback<Integer>() {
-                        @Override
-                        public void onSuccess(Integer mailItemId) {
-                            Log.i(TAG, "sendMail - Email sent");
-                            result.set(true);
-                        }
-
-                        @Override
-                        public void onFailure(Throwable t) {
-                            Log.e(TAG, "sendMail - " + t.getMessage());
-                            result.setException(t);
-                        }
-                    });
-        } catch (Exception e) {
-            Log.e(TAG, "sendMail - " + e.getMessage());
-            result.setException(e);
-        }
-        return result;
+        Log.i(TAG, "sendMail - Email with ID: " + mailId + "sent");
+        return mailId;
     }
 }
 
