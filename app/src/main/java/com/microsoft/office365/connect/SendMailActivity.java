@@ -19,7 +19,6 @@ import android.widget.Toast;
 import com.microsoft.discoveryservices.ServiceInfo;
 
 import java.text.MessageFormat;
-import java.util.concurrent.ExecutionException;
 
 /**
  * This activity handles the send mail operation of the app.

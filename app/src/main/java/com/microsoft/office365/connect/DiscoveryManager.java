@@ -5,10 +5,6 @@ package com.microsoft.office365.connect;
 
 import android.util.Log;
 
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.SettableFuture;
 import com.microsoft.discoveryservices.ServiceInfo;
 import com.microsoft.discoveryservices.odata.DiscoveryClient;
 import com.microsoft.services.odata.impl.ADALDependencyResolver;

@@ -5,10 +5,6 @@ package com.microsoft.office365.connect;
 
 import android.util.Log;
 
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.SettableFuture;
 import com.microsoft.outlookservices.BodyType;
 import com.microsoft.outlookservices.EmailAddress;
 import com.microsoft.outlookservices.ItemBody;
