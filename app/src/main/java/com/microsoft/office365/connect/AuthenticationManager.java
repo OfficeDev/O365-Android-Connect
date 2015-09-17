@@ -140,18 +140,24 @@ public class AuthenticationManager {
      * @param authenticationCallback The callback to notify when the processing is finished.
      */
     public void connect(final AuthenticationCallback<AuthenticationResult> authenticationCallback) {
-        if (verifyAuthenticationContext()) {
-            if(isConnected()) {
-                authenticateSilent(authenticationCallback);
-            } else {
-                authenticatePrompt(authenticationCallback);
+        // Since we're doing considerable work, let's get out of the main thread
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (verifyAuthenticationContext()) {
+                    if (isConnected()) {
+                        authenticateSilent(authenticationCallback);
+                    } else {
+                        authenticatePrompt(authenticationCallback);
+                    }
+                } else {
+                    Log.e(TAG, "connect - Auth context verification failed. Did you set a context activity?");
+                    throw new AuthenticationException(
+                            ADALError.ACTIVITY_REQUEST_INTENT_DATA_IS_NULL,
+                            "Auth context verification failed. Did you set a context activity?");
+                }
             }
-        } else {
-            Log.e(TAG, "connect - Auth context verification failed. Did you set a context activity?");
-            throw new AuthenticationException(
-                    ADALError.ACTIVITY_REQUEST_INTENT_DATA_IS_NULL,
-                    "Auth context verification failed. Did you set a context activity?");
-        }
+        }).start();
     }
 
     /**
@@ -252,8 +258,8 @@ public class AuthenticationManager {
 
     /**
      * Dependency resolver that can be used to create client objects.
-     * The {@link DiscoveryController#getServiceInfo} method uses it to create a DiscoveryClient object.
-     * The {@link MailController#sendMail(String, String, String)} uses it to create an OutlookClient object.
+     * The {@link DiscoveryManager#getServiceInfo} method uses it to create a DiscoveryClient object.
+     * The {@link MailManager#sendMail(String, String, String)} uses it to create an OutlookClient object.
      * @return The dependency resolver object.
      */
     public DependencyResolver getDependencyResolver() {
