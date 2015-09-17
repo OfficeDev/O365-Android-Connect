@@ -36,6 +36,7 @@ To use the Office 365 Connect sample for Android you need the following:
 3. Start Android Studio.
 	1. Close any projects that you might have open, then select **Open an existing Android Studio project**.
 	2. Browse to your local repository and select the O365-Android-Connect project. Click **OK**.
+
 	> Note: Android Studio might display a dialog asking if you want to use Gradle wrapper. Click **OK**.
 	> 
 	> Additionally, Android Studio shows a **Frameworks detected** notification if you don't have the **Android Support Repository** installed. Open the SDK manager and add the Android Support Repository to avoid the Frameworks detected notification.
