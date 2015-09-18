@@ -24,6 +24,7 @@ To use the Office 365 Connect sample for Android you need the following:
 
      > Note: If you already have a subscription, the previous link sends you to a page that says *Sorry, you can’t add that to your current account*. In that case use an account from your current Office 365 subscription.
      If you are already signed-in to Office 365, the Sign-in button in the previous link shows the message *Sorry, we can't process your request*. In that case sign-out from Office 365 in that same page and sign-in again.
+
 * A Microsoft Azure tenant to register your application. Azure Active Directory provides identity services that applications use for authentication and authorization. A trial subscription can be acquired here: [Microsoft Azure](https://account.windowsazure.com/SignUp).
 
      > Important: You will also need to ensure your Azure subscription is bound to your Office 365 tenant. To do this see the Active Directory team's blog post, [Creating and Managing Multiple Windows Azure Active Directories](http://blogs.technet.com/b/ad/archive/2013/11/08/creating-and-managing-multiple-windows-azure-active-directories.aspx). The section **Adding a new directory** will explain how to do this. You can also see [Set up your Office 365 development environment](https://msdn.microsoft.com/office/office365/howto/setup-development-environment#bk_CreateAzureSubscription) and the section **Associate your Office 365 account with Azure AD to create and manage apps** for more information.
@@ -37,6 +38,7 @@ To use the Office 365 Connect sample for Android you need the following:
 3. Start Android Studio.
 	1. Close any projects that you might have open, then select **Open an existing Android Studio project**.
 	2. Browse to your local repository and select the O365-Android-Connect project. Click **OK**.
+
 	> Note: Android Studio might display a dialog asking if you want to use Gradle wrapper. Click **OK**.
 	> 
 	> Additionally, Android Studio shows a **Frameworks detected** notification if you don't have the **Android Support Repository** installed. Open the SDK manager and add the Android Support Repository to avoid the Frameworks detected notification.
