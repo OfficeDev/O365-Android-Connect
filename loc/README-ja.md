@@ -1,5 +1,5 @@
 # Android 用 Office 365 Connect のサンプル
-[![Build Status](https://travis-ci.org/OfficeDev/O365-Android-Connect.svg)](https://travis-ci.org/OfficeDev/O365-Android-Connect)
+[![ビルドの状況](https://travis-ci.org/OfficeDev/O365-Android-Connect.svg)](https://travis-ci.org/OfficeDev/O365-Android-Connect)
 
 [日本 (日本語)](/loc/README-ja.md) (日本語)
 
@@ -23,6 +23,8 @@ Android 用 Office 365 Connect のサンプルを使用するには以下が必�
 * Office 365 アカウント。[Office 365 Developer](https://portal.office.com/Signup/Signup.aspx?OfferId=6881A1CB-F4EB-4db3-9F18-388898DAF510&DL=DEVELOPERPACK&ali=1#0) サブスクリプションにサイン アップすることができます。ここには、Office 365 アプリのビルドを開始するために必要なリソースが含まれています。
 
      > 注:サブスクリプションが既に存在する場合、上記のリンクをクリックすると、*申し訳ありません、現在のアカウントに追加できません* と表示されたページに移動します。その場合は、現在使用している Office 365 サブスクリプションのアカウントをご利用いただけます。
+     Office 365 にすでにサインインしている場合、上記のリンクの [サインイン] ボタンに、*申し訳ございません。お客様のリクエストを処理できません。* というメッセージが表示されます。その場合、その同じページで Office 365 からサインアウトし、その後もう一度サインインしてください。
+
 * アプリケーションを登録する Microsoft Azure テナント。Azure Active Directory は、アプリケーションが認証と承認に使用する ID サービスを提供します。ここでは、試用版サブスクリプションを取得できます。[Microsoft Azure](https://account.windowsazure.com/SignUp)。
 
      > 重要事項：Azure サブスクリプションが Office 365 テナントにバインドされていることを確認する必要があります。確認するには、Active Directory チームのブログ投稿「[複数の Windows Azure Active Directory を作成および管理する](http://blogs.technet.com/b/ad/archive/2013/11/08/creating-and-managing-multiple-windows-azure-active-directories.aspx)」を参照してください。「**新しいディレクトリを追加する**」セクションで、この方法について説明しています。また、詳細については、「[Office 365 開発環境をセットアップする](https://msdn.microsoft.com/office/office365/howto/setup-development-environment#bk_CreateAzureSubscription)」や「**Office 365 アカウントを Azure AD と関連付けてアプリを作成および管理する**」セクションも参照してください。
@@ -36,12 +38,13 @@ Android 用 Office 365 Connect のサンプルを使用するには以下が必�
 3. Android Studio を起動します。
 	1. 開いているプロジェクトをすべて閉じ、 **[既存のAndroid Studio プロジェクトを開く]** を選択します。
 	2. ローカル リポジトリを参照し、O365-Android-Connect プロジェクトを選択します。**[OK]** をクリックします。
+
 	> 注:Android Studio は、Gradle ラッパーを使用するかどうかを尋ねるダイアログを表示する場合があります。**[OK]** をクリックします。
 	>  
 	> また、**Android サポート リポジトリ**がインストールされていない場合、Android Studio は**フレームワーク検出**の通知を表示します。フレームワーク検出の通知が表示されないようにするには、SDK マネージャーを開き、Android サポート リポジトリを追加してください。
-4. Constants.java ファイルを開きます。
-	1. CLIENT\_ID 定数を検索して、その String 値を Azure Active Directory に登録されているクライアント ID と同じ値に設定します。
-	2. REDIRECT\_URI 定数を検索して、その String 値を Azure Active Directory に登録されているリダイレクト URI と同じ値に設定します。
+4. [```Constants.java```](app/src/main/java/com/microsoft/office365/connect/Constants.java) ファイルを開きます。
+	1. [```CLIENT_ID```](app/src/main/java/com/microsoft/office365/connect/Constants.java#L12) 定数を検索して、その String 値を Azure Active Directory に登録されているクライアント ID と同じ値に設定します。
+	2. [```REDIRECT_URI```](/app/src/main/java/com/microsoft/office365/connect/Constants.java#L13) 定数を検索して、その String 値を Azure Active Directory に登録されているリダイレクト URI と同じ値に設定します。
     ![Office 365 Connect sample](../readme-images/O365-Android-Connect-Constants.png "Client ID and Redirect URI values in Constants file")
 
     > 注:CLIENT\_ID と REDIRECT\_URI の値がない場合は、[ネイティブ クライアント アプリケーションを Azure に追加](https://msdn.microsoft.com/library/azure/dn132599.aspx#BKMK_Adding)し、CLIENT\_ID と REDIRECT_URI を書き留めます。
