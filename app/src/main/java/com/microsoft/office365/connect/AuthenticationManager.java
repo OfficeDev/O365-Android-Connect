@@ -20,9 +20,9 @@ import com.microsoft.aad.adal.AuthenticationResult;
 import com.microsoft.aad.adal.AuthenticationResult.AuthenticationStatus;
 import com.microsoft.aad.adal.AuthenticationSettings;
 import com.microsoft.aad.adal.PromptBehavior;
-import com.microsoft.services.orc.resolvers.ADALDependencyResolver;
 import com.microsoft.services.orc.core.DependencyResolver;
 import com.microsoft.services.orc.log.LogLevel;
+import com.microsoft.services.orc.resolvers.ADALDependencyResolver;
 
 import java.io.UnsupportedEncodingException;
 
