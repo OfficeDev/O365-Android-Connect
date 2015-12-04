@@ -77,7 +77,7 @@ public class DiscoveryManager {
      *                   is going to be discovered.
      * @param operationCallback The callback to which return the result or error.
      */
-    protected void getServiceInfoFromDiscoveryService(final String capability, final OperationCallback<ServiceInfo> operationCallback) {
+    private void getServiceInfoFromDiscoveryService(final String capability, final OperationCallback<ServiceInfo> operationCallback) {
         try {
             AuthenticationManager.getInstance().setResourceId(Constants.DISCOVERY_RESOURCE_ID);
             ADALDependencyResolver dependencyResolver = (ADALDependencyResolver) AuthenticationManager

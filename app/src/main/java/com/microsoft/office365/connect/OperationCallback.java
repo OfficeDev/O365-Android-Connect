@@ -9,7 +9,7 @@ package com.microsoft.office365.connect;
  * such as discovering a service or sending email.
  * @param <T> The result of the operation in case of success.
  */
-public interface OperationCallback<T> {
+interface OperationCallback<T> {
     /**
      * The method to call in case of success.
      * @param result The result of the operation.

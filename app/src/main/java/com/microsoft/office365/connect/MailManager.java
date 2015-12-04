@@ -61,7 +61,7 @@ public class MailManager {
      * Check to see if the service resource id and service endpoint uri values have been set.
      * @return True if service resource id and service endpoint uri have been set, false otherwise.
      */
-    public boolean isReady(){
+    private boolean isReady(){
         return mServiceEndpointUri != null && mServiceResourceId != null;
     }
 
