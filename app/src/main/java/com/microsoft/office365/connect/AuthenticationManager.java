@@ -48,7 +48,7 @@ public class AuthenticationManager {
      */
     private static byte[] generateSecretKey() {
         byte[] key = new byte[32];
-        byte[] android_id = null;
+        byte[] android_id;
 
         try{
             android_id = Settings.Secure.ANDROID_ID.getBytes("UTF-8");
