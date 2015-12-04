@@ -100,7 +100,7 @@ public class SendMailActivity extends AppCompatActivity {
      * Handler for the onclick event of the send mail button. It uses the MailManager
      * class to send an email to the address stored in the mEmailEditText view.
      * The subject and body of the message is stored in the strings.xml file.
-     * @param v
+     * @param v The view that sent the event.
      */
     public void onSendMailButtonClick(View v){
         resetUIForSendMail();
