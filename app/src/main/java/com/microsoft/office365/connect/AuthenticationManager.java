@@ -87,7 +87,7 @@ public class AuthenticationManager {
         return INSTANCE;
     }
 
-    public static synchronized void resetInstance() {
+    private static synchronized void resetInstance() {
         INSTANCE = null;
     }
 
