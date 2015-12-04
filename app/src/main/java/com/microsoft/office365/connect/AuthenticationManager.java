@@ -71,7 +71,7 @@ public class AuthenticationManager {
             AuthenticationSettings.INSTANCE.setSecretKey(generateSecretKey());
         }
 
-        // We're not using Microsoft Intune's Company portal app,
+        // We're not using Microsoft Intune Company portal app,
         // skip the broker check so we don't get warnings about the following permissions
         // in manifest:
         // GET_ACCOUNTS

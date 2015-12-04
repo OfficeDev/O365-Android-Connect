@@ -59,7 +59,7 @@ public class ConnectActivity extends AppCompatActivity {
         catch (IllegalArgumentException e) {
             Toast.makeText(
                     this
-                    , getString(R.string.warning_clientid_redirecturi_incorrect)
+                    , getString(R.string.warning_client_id_redirect_uri_incorrect)
                     , Toast.LENGTH_LONG).show();
 
             resetUIForConnect();

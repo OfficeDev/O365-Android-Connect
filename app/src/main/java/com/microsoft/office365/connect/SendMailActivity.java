@@ -141,7 +141,7 @@ public class SendMailActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         try {
             switch (item.getItemId()) {
-                case R.id.disconnectMenuitem:
+                case R.id.disconnectMenuItem:
                     AuthenticationManager.getInstance().disconnect();
                     showDisconnectSuccessUI();
                     Intent connectIntent = new Intent(this, ConnectActivity.class);
@@ -235,7 +235,7 @@ public class SendMailActivity extends AppCompatActivity {
             public void run(){
                 mSendMailProgressBar.setVisibility(View.GONE);
                 mSendMailButton.setVisibility(View.VISIBLE);
-                mConclusionTextView.setText(R.string.sendmail_text_error);
+                mConclusionTextView.setText(R.string.send_mail_text_error);
                 mConclusionTextView.setVisibility(View.VISIBLE);
                 Toast.makeText(
                         SendMailActivity.this,

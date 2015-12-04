@@ -23,13 +23,13 @@
     <string name="title_text_error">Oops!</string>
     <string name="connect_text_error">\nSorry, can\'t connect to Office 365.\nHint: Check logcat for details.</string>
     <string name="discover_text_error">\nSorry, can\'t find the mail service.\nHint: Check logcat for details.</string>
-    <string name="sendmail_text_error">\nSorry, can\'t send the email.\nHint: Check logcat for details.</string>
+    <string name="send_mail_text_error">\nSorry, can\'t send the email.\nHint: Check logcat for details.</string>
 
     <!-- Toast error messages -->
     <string name="connect_toast_text_error">Error connecting to Office 365\nCheck logcat for details</string>
     <string name="discover_toast_text_error">Error finding mail service\nCheck logcat for details</string>
     <string name="send_mail_toast_text_error">Error sending email\nCheck logcat for details</string>
-    <string name="warning_clientid_redirecturi_incorrect">The client ID or redirect URI is not valid. Enter a valid client ID and redirect URI in the Constants.java file and run again</string>
+    <string name="warning_client_id_redirect_uri_incorrect">The client ID or redirect URI is not valid. Enter a valid client ID and redirect URI in the Constants.java file and run again</string>
 
     <!-- Email text -->
     <string name="mail_subject_text">Welcome to Office 365 development on Android with the Office 365 Connect sample</string>
