@@ -5,9 +5,9 @@ package com.microsoft.office365.connect;
 
 import android.util.Log;
 
-import com.microsoft.discoveryservices.ServiceInfo;
-import com.microsoft.discoveryservices.odata.DiscoveryClient;
-import com.microsoft.services.odata.impl.ADALDependencyResolver;
+import com.microsoft.services.discovery.ServiceInfo;
+import com.microsoft.services.discovery.fetchers.DiscoveryClient;
+import com.microsoft.services.orc.resolvers.ADALDependencyResolver;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -50,8 +50,8 @@ public class DiscoveryManager {
                 // First, look in the locally cached services.
                 if(mServices != null) {
                     for (ServiceInfo serviceInfo : mServices) {
-                        if (serviceInfo.getcapability().equals(capability)) {
-                            Log.i(TAG, "getServiceInfo - " + serviceInfo.getserviceName() + " service for " + capability + " was found in local cached services");
+                        if (serviceInfo.getCapability().equals(capability)) {
+                            Log.i(TAG, "getServiceInfo - " + serviceInfo.getServiceName() + " service for " + capability + " was found in local cached services");
                             operationCallback.onSuccess(serviceInfo);
                             return;
                         }
@@ -87,7 +87,7 @@ public class DiscoveryManager {
 
             List<ServiceInfo> services =
                     discoveryClient
-                            .getservices()
+                            .getServices()
                             .select("serviceResourceId,serviceEndpointUri,capability")
                             .read().get();
 
@@ -96,9 +96,9 @@ public class DiscoveryManager {
             mServices = services;
 
             for (ServiceInfo serviceInfo : services) {
-                if (serviceInfo.getcapability().equals(capability)) {
+                if (serviceInfo.getCapability().equals(capability)) {
                     // We found the service, send the info to the caller and end this method call
-                    Log.i(TAG, "getServiceInfoFromDiscoveryService - " + serviceInfo.getserviceName() + " service for " + capability + " was found in services retrieved from discovery");
+                    Log.i(TAG, "getServiceInfoFromDiscoveryService - " + serviceInfo.getServiceName() + " service for " + capability + " was found in services retrieved from discovery");
                     operationCallback.onSuccess(serviceInfo);
                     return;
                 }

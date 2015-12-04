@@ -20,9 +20,9 @@ import com.microsoft.aad.adal.AuthenticationResult;
 import com.microsoft.aad.adal.AuthenticationResult.AuthenticationStatus;
 import com.microsoft.aad.adal.AuthenticationSettings;
 import com.microsoft.aad.adal.PromptBehavior;
-import com.microsoft.services.odata.impl.ADALDependencyResolver;
-import com.microsoft.services.odata.interfaces.DependencyResolver;
-import com.microsoft.services.odata.interfaces.LogLevel;
+import com.microsoft.services.orc.resolvers.ADALDependencyResolver;
+import com.microsoft.services.orc.core.DependencyResolver;
+import com.microsoft.services.orc.log.LogLevel;
 
 import java.io.UnsupportedEncodingException;
 
@@ -259,7 +259,7 @@ public class AuthenticationManager {
     /**
      * Dependency resolver that can be used to create client objects.
      * The {@link DiscoveryManager#getServiceInfo} method uses it to create a DiscoveryClient object.
-     * The {@link MailManager#sendMail(String, String, String)} uses it to create an OutlookClient object.
+     * The {@link MailManager#sendMail(String, String, String, OperationCallback)} uses it to create an OutlookClient object.
      * @return The dependency resolver object.
      */
     public DependencyResolver getDependencyResolver() {

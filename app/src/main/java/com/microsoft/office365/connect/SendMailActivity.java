@@ -16,7 +16,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.microsoft.discoveryservices.ServiceInfo;
+import com.microsoft.services.discovery.ServiceInfo;
 
 import java.text.MessageFormat;
 
@@ -75,12 +75,12 @@ public class SendMailActivity extends AppCompatActivity {
                                 MailManager
                                         .getInstance()
                                         .setServiceResourceId(
-                                                serviceInfo.getserviceResourceId()
+                                                serviceInfo.getServiceResourceId()
                                         );
                                 MailManager
                                         .getInstance()
                                         .setServiceEndpointUri(
-                                                serviceInfo.getserviceEndpointUri()
+                                                serviceInfo.getServiceEndpointUri()
                                         );
 
                                 showDiscoverSuccessUI();

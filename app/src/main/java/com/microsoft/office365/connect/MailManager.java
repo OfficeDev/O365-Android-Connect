@@ -5,13 +5,13 @@ package com.microsoft.office365.connect;
 
 import android.util.Log;
 
-import com.microsoft.outlookservices.BodyType;
-import com.microsoft.outlookservices.EmailAddress;
-import com.microsoft.outlookservices.ItemBody;
-import com.microsoft.outlookservices.Message;
-import com.microsoft.outlookservices.Recipient;
-import com.microsoft.outlookservices.odata.OutlookClient;
-import com.microsoft.services.odata.impl.ADALDependencyResolver;
+import com.microsoft.services.outlook.BodyType;
+import com.microsoft.services.outlook.EmailAddress;
+import com.microsoft.services.outlook.ItemBody;
+import com.microsoft.services.outlook.Message;
+import com.microsoft.services.outlook.Recipient;
+import com.microsoft.services.outlook.fetchers.OutlookClient;
+import com.microsoft.services.orc.resolvers.ADALDependencyResolver;
 
 import java.util.ArrayList;
 import java.util.List;
