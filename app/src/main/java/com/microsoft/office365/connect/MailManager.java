@@ -1,17 +1,18 @@
 /*
- *  Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See full license at the bottom of this file.
+ * Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
+ * See LICENSE in the project root for license information.
  */
 package com.microsoft.office365.connect;
 
 import android.util.Log;
 
-import com.microsoft.outlookservices.BodyType;
-import com.microsoft.outlookservices.EmailAddress;
-import com.microsoft.outlookservices.ItemBody;
-import com.microsoft.outlookservices.Message;
-import com.microsoft.outlookservices.Recipient;
-import com.microsoft.outlookservices.odata.OutlookClient;
-import com.microsoft.services.odata.impl.ADALDependencyResolver;
+import com.microsoft.services.orc.resolvers.ADALDependencyResolver;
+import com.microsoft.services.outlook.BodyType;
+import com.microsoft.services.outlook.EmailAddress;
+import com.microsoft.services.outlook.ItemBody;
+import com.microsoft.services.outlook.Message;
+import com.microsoft.services.outlook.Recipient;
+import com.microsoft.services.outlook.fetchers.OutlookClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +61,7 @@ public class MailManager {
      * Check to see if the service resource id and service endpoint uri values have been set.
      * @return True if service resource id and service endpoint uri have been set, false otherwise.
      */
-    public boolean isReady(){
+    private boolean isReady(){
         return mServiceEndpointUri != null && mServiceResourceId != null;
     }
 
@@ -130,32 +131,3 @@ public class MailManager {
         }).start();
     }
 }
-
-// *********************************************************
-//
-// O365-Android-Connect, https://github.com/OfficeDev/O365-Android-Connect
-//
-// Copyright (c) Microsoft Corporation
-// All rights reserved.
-//
-// MIT License:
-// Permission is hereby granted, free of charge, to any person obtaining
-// a copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to
-// permit persons to whom the Software is furnished to do so, subject to
-// the following conditions:
-//
-// The above copyright notice and this permission notice shall be
-// included in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
-// *********************************************************

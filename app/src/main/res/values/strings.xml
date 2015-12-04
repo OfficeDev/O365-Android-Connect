@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!-- Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See full license at the bottom of this file. -->
+<!--
+   - Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
+   - See LICENSE in the project root for license information.
+  -->
 <resources>
 
     <!-- Regular UI text -->
@@ -20,13 +23,13 @@
     <string name="title_text_error">Oops!</string>
     <string name="connect_text_error">\nSorry, can\'t connect to Office 365.\nHint: Check logcat for details.</string>
     <string name="discover_text_error">\nSorry, can\'t find the mail service.\nHint: Check logcat for details.</string>
-    <string name="sendmail_text_error">\nSorry, can\'t send the email.\nHint: Check logcat for details.</string>
+    <string name="send_mail_text_error">\nSorry, can\'t send the email.\nHint: Check logcat for details.</string>
 
     <!-- Toast error messages -->
     <string name="connect_toast_text_error">Error connecting to Office 365\nCheck logcat for details</string>
     <string name="discover_toast_text_error">Error finding mail service\nCheck logcat for details</string>
     <string name="send_mail_toast_text_error">Error sending email\nCheck logcat for details</string>
-    <string name="warning_clientid_redirecturi_incorrect">The client ID or redirect URI is not valid. Enter a valid client ID and redirect URI in the Constants.java file and run again</string>
+    <string name="warning_client_id_redirect_uri_incorrect">The client ID or redirect URI is not valid. Enter a valid client ID and redirect URI in the Constants.java file and run again</string>
 
     <!-- Email text -->
     <string name="mail_subject_text">Welcome to Office 365 development on Android with the Office 365 Connect sample</string>
@@ -68,32 +71,3 @@ log an issue&lt;/a&gt; on our repository. &lt;/p&gt;
 &lt;/body&gt;
 &lt;/html&gt;</string>
 </resources>
-
-<!-- *********************************************************
-
-     O365-Android-Connect, https://github.com/OfficeDev/O365-Android-Connect
-
-     Copyright (c) Microsoft Corporation
-     All rights reserved.
-
-     MIT License:
-     Permission is hereby granted, free of charge, to any person obtaining
-     a copy of this software and associated documentation files (the
-     "Software"), to deal in the Software without restriction, including
-     without limitation the rights to use, copy, modify, merge, publish,
-     distribute, sublicense, and/or sell copies of the Software, and to
-     permit persons to whom the Software is furnished to do so, subject to
-     the following conditions:
-
-     The above copyright notice and this permission notice shall be
-     included in all copies or substantial portions of the Software.
-
-     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-     EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-     MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-     NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-     LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-     OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-     WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-     ********************************************************* -->

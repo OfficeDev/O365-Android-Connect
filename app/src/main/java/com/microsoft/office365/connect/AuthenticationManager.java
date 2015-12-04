@@ -1,8 +1,7 @@
 /*
-* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See full license at the bottom of this file.
-* Portions of this class are adapted from the AuthenticationController.java file from Microsoft Open Technologies, Inc.
-* located at https://github.com/OfficeDev/Office-365-SDK-for-Android/blob/master/samples/outlook/app/src/main/java/com/microsoft/services/controllers/AuthenticationController.java
-*/
+ * Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
+ * See LICENSE in the project root for license information.
+ */
 package com.microsoft.office365.connect;
 
 import android.app.Activity;
@@ -20,9 +19,9 @@ import com.microsoft.aad.adal.AuthenticationResult;
 import com.microsoft.aad.adal.AuthenticationResult.AuthenticationStatus;
 import com.microsoft.aad.adal.AuthenticationSettings;
 import com.microsoft.aad.adal.PromptBehavior;
-import com.microsoft.services.odata.impl.ADALDependencyResolver;
-import com.microsoft.services.odata.interfaces.DependencyResolver;
-import com.microsoft.services.odata.interfaces.LogLevel;
+import com.microsoft.services.orc.core.DependencyResolver;
+import com.microsoft.services.orc.log.LogLevel;
+import com.microsoft.services.orc.resolvers.ADALDependencyResolver;
 
 import java.io.UnsupportedEncodingException;
 
@@ -49,7 +48,7 @@ public class AuthenticationManager {
      */
     private static byte[] generateSecretKey() {
         byte[] key = new byte[32];
-        byte[] android_id = null;
+        byte[] android_id;
 
         try{
             android_id = Settings.Secure.ANDROID_ID.getBytes("UTF-8");
@@ -72,7 +71,7 @@ public class AuthenticationManager {
             AuthenticationSettings.INSTANCE.setSecretKey(generateSecretKey());
         }
 
-        // We're not using Microsoft Intune's Company portal app,
+        // We're not using Microsoft Intune Company portal app,
         // skip the broker check so we don't get warnings about the following permissions
         // in manifest:
         // GET_ACCOUNTS
@@ -88,7 +87,7 @@ public class AuthenticationManager {
         return INSTANCE;
     }
 
-    public static synchronized void resetInstance() {
+    private static synchronized void resetInstance() {
         INSTANCE = null;
     }
 
@@ -259,7 +258,7 @@ public class AuthenticationManager {
     /**
      * Dependency resolver that can be used to create client objects.
      * The {@link DiscoveryManager#getServiceInfo} method uses it to create a DiscoveryClient object.
-     * The {@link MailManager#sendMail(String, String, String)} uses it to create an OutlookClient object.
+     * The {@link MailManager#sendMail(String, String, String, OperationCallback)} uses it to create an OutlookClient object.
      * @return The dependency resolver object.
      */
     public DependencyResolver getDependencyResolver() {
@@ -327,32 +326,3 @@ public class AuthenticationManager {
         editor.apply();
     }
 }
-
-// *********************************************************
-//
-// O365-Android-Connect, https://github.com/OfficeDev/O365-Android-Connect
-//
-// Copyright (c) Microsoft Corporation
-// All rights reserved.
-//
-// MIT License:
-// Permission is hereby granted, free of charge, to any person obtaining
-// a copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to
-// permit persons to whom the Software is furnished to do so, subject to
-// the following conditions:
-//
-// The above copyright notice and this permission notice shall be
-// included in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
-// *********************************************************

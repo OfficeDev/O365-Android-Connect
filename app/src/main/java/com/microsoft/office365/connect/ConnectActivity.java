@@ -1,5 +1,6 @@
 /*
- *  Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See full license at the bottom of this file.
+ * Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
+ * See LICENSE in the project root for license information.
  */
 package com.microsoft.office365.connect;
 
@@ -45,7 +46,7 @@ public class ConnectActivity extends AppCompatActivity {
 
     /**
      * Event handler for the onclick event of the button.
-     * @param v
+     * @param v The view that sent the event.
      */
     public void onConnectButtonClick(View v) {
         showConnectingInProgressUI();
@@ -58,7 +59,7 @@ public class ConnectActivity extends AppCompatActivity {
         catch (IllegalArgumentException e) {
             Toast.makeText(
                     this
-                    , getString(R.string.warning_clientid_redirecturi_incorrect)
+                    , getString(R.string.warning_client_id_redirect_uri_incorrect)
                     , Toast.LENGTH_LONG).show();
 
             resetUIForConnect();
@@ -153,32 +154,3 @@ public class ConnectActivity extends AppCompatActivity {
                 Toast.LENGTH_LONG).show();
     }
 }
-
-// *********************************************************
-//
-// O365-Android-Connect, https://github.com/OfficeDev/O365-Android-Connect
-//
-// Copyright (c) Microsoft Corporation
-// All rights reserved.
-//
-// MIT License:
-// Permission is hereby granted, free of charge, to any person obtaining
-// a copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to
-// permit persons to whom the Software is furnished to do so, subject to
-// the following conditions:
-//
-// The above copyright notice and this permission notice shall be
-// included in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
-// *********************************************************

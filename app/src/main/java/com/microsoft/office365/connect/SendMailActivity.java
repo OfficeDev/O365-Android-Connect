@@ -1,5 +1,6 @@
 /*
- *  Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See full license at the bottom of this file.
+ * Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
+ * See LICENSE in the project root for license information.
  */
 package com.microsoft.office365.connect;
 
@@ -16,7 +17,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.microsoft.discoveryservices.ServiceInfo;
+import com.microsoft.services.discovery.ServiceInfo;
 
 import java.text.MessageFormat;
 
@@ -75,12 +76,12 @@ public class SendMailActivity extends AppCompatActivity {
                                 MailManager
                                         .getInstance()
                                         .setServiceResourceId(
-                                                serviceInfo.getserviceResourceId()
+                                                serviceInfo.getServiceResourceId()
                                         );
                                 MailManager
                                         .getInstance()
                                         .setServiceEndpointUri(
-                                                serviceInfo.getserviceEndpointUri()
+                                                serviceInfo.getServiceEndpointUri()
                                         );
 
                                 showDiscoverSuccessUI();
@@ -99,7 +100,7 @@ public class SendMailActivity extends AppCompatActivity {
      * Handler for the onclick event of the send mail button. It uses the MailManager
      * class to send an email to the address stored in the mEmailEditText view.
      * The subject and body of the message is stored in the strings.xml file.
-     * @param v
+     * @param v The view that sent the event.
      */
     public void onSendMailButtonClick(View v){
         resetUIForSendMail();
@@ -140,7 +141,7 @@ public class SendMailActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         try {
             switch (item.getItemId()) {
-                case R.id.disconnectMenuitem:
+                case R.id.disconnectMenuItem:
                     AuthenticationManager.getInstance().disconnect();
                     showDisconnectSuccessUI();
                     Intent connectIntent = new Intent(this, ConnectActivity.class);
@@ -234,7 +235,7 @@ public class SendMailActivity extends AppCompatActivity {
             public void run(){
                 mSendMailProgressBar.setVisibility(View.GONE);
                 mSendMailButton.setVisibility(View.VISIBLE);
-                mConclusionTextView.setText(R.string.sendmail_text_error);
+                mConclusionTextView.setText(R.string.send_mail_text_error);
                 mConclusionTextView.setVisibility(View.VISIBLE);
                 Toast.makeText(
                         SendMailActivity.this,
@@ -257,32 +258,3 @@ public class SendMailActivity extends AppCompatActivity {
                 Toast.LENGTH_SHORT).show();
     }
 }
-
-// *********************************************************
-//
-// O365-Android-Connect, https://github.com/OfficeDev/O365-Android-Connect
-//
-// Copyright (c) Microsoft Corporation
-// All rights reserved.
-//
-// MIT License:
-// Permission is hereby granted, free of charge, to any person obtaining
-// a copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to
-// permit persons to whom the Software is furnished to do so, subject to
-// the following conditions:
-//
-// The above copyright notice and this permission notice shall be
-// included in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
-// *********************************************************
