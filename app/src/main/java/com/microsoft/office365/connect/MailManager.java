@@ -20,10 +20,9 @@ import java.util.MissingResourceException;
 import java.util.concurrent.ExecutionException;
 
 /**
- * Handles the creation of the message and contacting the
- * mail service to send the message. The app must have
- * connected to Office 365 and discovered the mail service
- * endpoints before using the sendMail method.
+ * Handles the creation of the message and contacting the mail service to send the message.
+ * The app must have connected to Office 365 and discovered the mail service endpoints before
+ * sending an email.
  */
 public class MailManager {
 
@@ -31,39 +30,6 @@ public class MailManager {
 
     private String mServiceResourceId;
     private String mServiceEndpointUri;
-
-    public static synchronized MailManager getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new MailManager();
-        }
-        return INSTANCE;
-    }
-
-    private static MailManager INSTANCE;
-
-    /**
-     * Store the service resource id from the discovered service.
-     * @param serviceResourceId The service resource id obtained from the discovery service.
-     */
-    public void setServiceResourceId(final String serviceResourceId) {
-        this.mServiceResourceId = serviceResourceId;
-    }
-
-    /**
-     * Store the service endpoint uri from the discovered service.
-     * @param serviceEndpointUri The service endpoint uri obtained from the discovery service.
-     */
-    public void setServiceEndpointUri(final String serviceEndpointUri) {
-        this.mServiceEndpointUri = serviceEndpointUri;
-    }
-
-    /**
-     * Check to see if the service resource id and service endpoint uri values have been set.
-     * @return True if service resource id and service endpoint uri have been set, false otherwise.
-     */
-    private boolean isReady(){
-        return mServiceEndpointUri != null && mServiceResourceId != null;
-    }
 
     /**
      * Sends an email message using the Office 365 mail capability from the address of the
@@ -129,5 +95,38 @@ public class MailManager {
                 }
             }
         }).start();
+    }
+
+    public static synchronized MailManager getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new MailManager();
+        }
+        return INSTANCE;
+    }
+
+    private static MailManager INSTANCE;
+
+    /**
+     * Store the service resource id from the discovered service.
+     * @param serviceResourceId The service resource id obtained from the discovery service.
+     */
+    public void setServiceResourceId(final String serviceResourceId) {
+        this.mServiceResourceId = serviceResourceId;
+    }
+
+    /**
+     * Store the service endpoint uri from the discovered service.
+     * @param serviceEndpointUri The service endpoint uri obtained from the discovery service.
+     */
+    public void setServiceEndpointUri(final String serviceEndpointUri) {
+        this.mServiceEndpointUri = serviceEndpointUri;
+    }
+
+    /**
+     * Check to see if the service resource id and service endpoint uri values have been set.
+     * @return True if service resource id and service endpoint uri have been set, false otherwise.
+     */
+    private boolean isReady(){
+        return mServiceEndpointUri != null && mServiceResourceId != null;
     }
 }
