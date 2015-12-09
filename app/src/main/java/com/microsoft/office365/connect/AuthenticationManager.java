@@ -27,6 +27,13 @@ import java.io.UnsupportedEncodingException;
 
 /**
  * Handles setup of ADAL Dependency Resolver for use in API clients.
+ * Check the {@link AuthenticationManager#connect(AuthenticationCallback)} method to learn how to
+ * get Azure AD tokens for your app.
+ * You can also check {@link AuthenticationManager#authenticatePrompt(AuthenticationCallback)} to
+ * learn how to get tokens by prompting the user for credentials, or
+ * {@link AuthenticationManager#authenticateSilent(AuthenticationCallback)} to learn how to get
+ * tokens silently.
+ * To learn how to dispose the tokens, see {@link AuthenticationManager#disconnect()}.
  */
 
 public class AuthenticationManager {
