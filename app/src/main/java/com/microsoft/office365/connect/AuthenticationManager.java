@@ -38,32 +38,6 @@ public class AuthenticationManager {
     private Activity mContextActivity;
     private String mResourceId;
 
-    /**
-     * Generates an encryption key for devices with API level lower than 18 using the
-     * ANDROID_ID value as a seed.
-     * In production scenarios, you should come up with your own implementation of this method.
-     * Consider that your algorithm must return the same key so it can encrypt/decrypt values
-     * successfully.
-     * @return The encryption key in a 32 byte long array.
-     */
-    private static byte[] generateSecretKey() {
-        byte[] key = new byte[32];
-        byte[] android_id;
-
-        try{
-            android_id = Settings.Secure.ANDROID_ID.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e){
-            Log.e(TAG, "generateSecretKey - " + e.getMessage());
-            throw new RuntimeException(e);
-        }
-
-        for(int i = 0; i < key.length; i++){
-            key[i] = android_id[i % android_id.length];
-        }
-
-        return key;
-    }
-
     static{
         // Devices with API level lower than 18 must setup an encryption key.
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2 &&
@@ -78,59 +52,6 @@ public class AuthenticationManager {
         // USE_CREDENTIALS
         // MANAGE_ACCOUNTS
         AuthenticationSettings.INSTANCE.setSkipBroker(true);
-    }
-
-    public static synchronized AuthenticationManager getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new AuthenticationManager();
-        }
-        return INSTANCE;
-    }
-
-    private static synchronized void resetInstance() {
-        INSTANCE = null;
-    }
-
-    private static AuthenticationManager INSTANCE;
-
-    private AuthenticationManager() {
-        mResourceId = Constants.DISCOVERY_RESOURCE_ID;
-    }
-
-    /**
-     * Set the context activity before connecting to the currently active activity.
-     * @param contextActivity Currently active activity which can be utilized for interactive
-     *                        prompt.
-     */
-    public void setContextActivity(final Activity contextActivity) {
-        this.mContextActivity = contextActivity;
-    }
-
-    /**
-     * Change from the default Resource ID set in ServiceConstants to a different
-     * resource ID.
-     * This can be called at anytime without requiring another interactive prompt.
-     * @param resourceId URL of resource ID to be accessed on behalf of user.
-     */
-    public void setResourceId(final String resourceId) {
-        this.mResourceId = resourceId;
-        this.mDependencyResolver.setResourceId(resourceId);
-    }
-
-    /**
-     * Turn logging on.
-     * @param level LogLevel to set.
-     */
-    public void enableLogging(LogLevel level) {
-        this.mDependencyResolver.getLogger().setEnabled(true);
-        this.mDependencyResolver.getLogger().setLogLevel(level);
-    }
-
-    /**
-     * Turn logging off.
-     */
-    public void disableLogging() {
-        this.mDependencyResolver.getLogger().setEnabled(false);
     }
 
     /**
@@ -241,6 +162,60 @@ public class AuthenticationManager {
     }
 
     /**
+     * Disconnects the app from Office 365 by clearing the token cache, setting the client objects
+     * to null, and removing the user id from shred preferences.
+     */
+    public void disconnect(){
+        // Clear tokens.
+        if(getAuthenticationContext().getCache() != null) {
+            getAuthenticationContext().getCache().removeAll();
+        }
+
+        // Reset the AuthenticationManager object
+        AuthenticationManager.resetInstance();
+
+        // Forget the user
+        removeUserId();
+    }
+
+    public static synchronized AuthenticationManager getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new AuthenticationManager();
+        }
+        return INSTANCE;
+    }
+
+    private static synchronized void resetInstance() {
+        INSTANCE = null;
+    }
+
+    private static AuthenticationManager INSTANCE;
+
+    private AuthenticationManager() {
+        mResourceId = Constants.DISCOVERY_RESOURCE_ID;
+    }
+
+    /**
+     * Set the context activity before connecting to the currently active activity.
+     * @param contextActivity Currently active activity which can be utilized for interactive
+     *                        prompt.
+     */
+    public void setContextActivity(final Activity contextActivity) {
+        this.mContextActivity = contextActivity;
+    }
+
+    /**
+     * Change from the default Resource ID set in ServiceConstants to a different
+     * resource ID.
+     * This can be called at anytime without requiring another interactive prompt.
+     * @param resourceId URL of resource ID to be accessed on behalf of user.
+     */
+    public void setResourceId(final String resourceId) {
+        this.mResourceId = resourceId;
+        this.mDependencyResolver.setResourceId(resourceId);
+    }
+
+    /**
      * Gets authentication context for Azure Active Directory.
      * @return an authentication context, if successful.
      */
@@ -263,23 +238,6 @@ public class AuthenticationManager {
      */
     public DependencyResolver getDependencyResolver() {
         return getInstance().mDependencyResolver;
-    }
-
-    /**
-     * Disconnects the app from Office 365 by clearing the token cache, setting the client objects
-     * to null, and removing the user id from shred preferences.
-     */
-    public void disconnect(){
-        // Clear tokens.
-        if(getAuthenticationContext().getCache() != null) {
-            getAuthenticationContext().getCache().removeAll();
-        }
-
-        // Reset the AuthenticationManager object
-        AuthenticationManager.resetInstance();
-
-        // Forget the user
-        removeUserId();
     }
 
     private boolean verifyAuthenticationContext() {
@@ -324,5 +282,47 @@ public class AuthenticationManager {
         SharedPreferences.Editor editor = settings.edit();
         editor.remove(USER_ID_VAR_NAME);
         editor.apply();
+    }
+
+    /**
+     * Generates an encryption key for devices with API level lower than 18 using the
+     * ANDROID_ID value as a seed.
+     * In production scenarios, you should come up with your own implementation of this method.
+     * Consider that your algorithm must return the same key so it can encrypt/decrypt values
+     * successfully.
+     * @return The encryption key in a 32 byte long array.
+     */
+    private static byte[] generateSecretKey() {
+        byte[] key = new byte[32];
+        byte[] android_id;
+
+        try{
+            android_id = Settings.Secure.ANDROID_ID.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e){
+            Log.e(TAG, "generateSecretKey - " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+
+        for(int i = 0; i < key.length; i++){
+            key[i] = android_id[i % android_id.length];
+        }
+
+        return key;
+    }
+
+    /**
+     * Turn logging on.
+     * @param level LogLevel to set.
+     */
+    public void enableLogging(LogLevel level) {
+        this.mDependencyResolver.getLogger().setEnabled(true);
+        this.mDependencyResolver.getLogger().setLogLevel(level);
+    }
+
+    /**
+     * Turn logging off.
+     */
+    public void disableLogging() {
+        this.mDependencyResolver.getLogger().setEnabled(false);
     }
 }
