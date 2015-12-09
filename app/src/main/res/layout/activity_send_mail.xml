@@ -40,11 +40,11 @@
         android:layout_below="@+id/descriptionTextView"
         android:visibility="visible" />
 
-    <ImageButton
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="@string/send_mail_button_text"
         android:id="@+id/sendMailButton"
-        android:src="@drawable/mail_icon"
         android:onClick="onSendMailButtonClick"
         android:layout_below="@+id/emailEditText"
         android:layout_centerHorizontal="true"
