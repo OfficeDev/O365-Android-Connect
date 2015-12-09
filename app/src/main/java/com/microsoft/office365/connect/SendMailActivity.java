@@ -11,8 +11,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,7 +34,7 @@ public class SendMailActivity extends AppCompatActivity {
     private TextView mTitleTextView;
     private TextView mDescriptionTextView;
     private EditText mEmailEditText;
-    private ImageButton mSendMailButton;
+    private Button mSendMailButton;
     private ProgressBar mSendMailProgressBar;
     private TextView mConclusionTextView;
 
@@ -164,7 +164,7 @@ public class SendMailActivity extends AppCompatActivity {
         mTitleTextView = (TextView)findViewById(R.id.titleTextView);
         mDescriptionTextView = (TextView)findViewById(R.id.descriptionTextView);
         mEmailEditText = (EditText)findViewById(R.id.emailEditText);
-        mSendMailButton = (ImageButton)findViewById(R.id.sendMailButton);
+        mSendMailButton = (Button)findViewById(R.id.sendMailButton);
         mSendMailProgressBar = (ProgressBar)findViewById(R.id.sendMailProgressBar);
         mConclusionTextView = (TextView)findViewById(R.id.conclusionTextView);
     }
