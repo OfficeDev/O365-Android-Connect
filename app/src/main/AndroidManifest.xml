@@ -4,7 +4,8 @@
    - See LICENSE in the project root for license information.
   -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.microsoft.office365.connect" >
+          xmlns:tools="http://schemas.android.com/tools"
+          package="com.microsoft.office365.connect">
 
     <!-- Required to connect to Office 365 -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -12,7 +13,8 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
-        android:allowBackup="true"
+        tools:replace="android:allowBackup"
+        android:allowBackup="false"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
