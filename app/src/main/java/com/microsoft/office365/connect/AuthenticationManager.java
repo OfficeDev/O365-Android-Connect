@@ -1,8 +1,7 @@
 /*
-* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See full license at the bottom of this file.
-* Portions of this class are adapted from the AuthenticationController.java file from Microsoft Open Technologies, Inc.
-* located at https://github.com/OfficeDev/Office-365-SDK-for-Android/blob/master/samples/outlook/app/src/main/java/com/microsoft/services/controllers/AuthenticationController.java
-*/
+ * Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
+ * See LICENSE in the project root for license information.
+ */
 package com.microsoft.office365.connect;
 
 import android.app.Activity;
@@ -20,14 +19,21 @@ import com.microsoft.aad.adal.AuthenticationResult;
 import com.microsoft.aad.adal.AuthenticationResult.AuthenticationStatus;
 import com.microsoft.aad.adal.AuthenticationSettings;
 import com.microsoft.aad.adal.PromptBehavior;
-import com.microsoft.services.odata.impl.ADALDependencyResolver;
-import com.microsoft.services.odata.interfaces.DependencyResolver;
-import com.microsoft.services.odata.interfaces.LogLevel;
+import com.microsoft.services.orc.core.DependencyResolver;
+import com.microsoft.services.orc.log.LogLevel;
+import com.microsoft.services.orc.resolvers.ADALDependencyResolver;
 
 import java.io.UnsupportedEncodingException;
 
 /**
  * Handles setup of ADAL Dependency Resolver for use in API clients.
+ * Check the {@link AuthenticationManager#connect(AuthenticationCallback)} method to learn how to
+ * get Azure AD tokens for your app.
+ * You can also check {@link AuthenticationManager#authenticatePrompt(AuthenticationCallback)} to
+ * learn how to get tokens by prompting the user for credentials, or
+ * {@link AuthenticationManager#authenticateSilent(AuthenticationCallback)} to learn how to get
+ * tokens silently.
+ * To learn how to dispose the tokens, see {@link AuthenticationManager#disconnect()}.
  */
 
 public class AuthenticationManager {
@@ -39,32 +45,6 @@ public class AuthenticationManager {
     private Activity mContextActivity;
     private String mResourceId;
 
-    /**
-     * Generates an encryption key for devices with API level lower than 18 using the
-     * ANDROID_ID value as a seed.
-     * In production scenarios, you should come up with your own implementation of this method.
-     * Consider that your algorithm must return the same key so it can encrypt/decrypt values
-     * successfully.
-     * @return The encryption key in a 32 byte long array.
-     */
-    private static byte[] generateSecretKey() {
-        byte[] key = new byte[32];
-        byte[] android_id = null;
-
-        try{
-            android_id = Settings.Secure.ANDROID_ID.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e){
-            Log.e(TAG, "generateSecretKey - " + e.getMessage());
-            throw new RuntimeException(e);
-        }
-
-        for(int i = 0; i < key.length; i++){
-            key[i] = android_id[i % android_id.length];
-        }
-
-        return key;
-    }
-
     static{
         // Devices with API level lower than 18 must setup an encryption key.
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2 &&
@@ -72,7 +52,7 @@ public class AuthenticationManager {
             AuthenticationSettings.INSTANCE.setSecretKey(generateSecretKey());
         }
 
-        // We're not using Microsoft Intune's Company portal app,
+        // We're not using Microsoft Intune Company portal app,
         // skip the broker check so we don't get warnings about the following permissions
         // in manifest:
         // GET_ACCOUNTS
@@ -81,77 +61,30 @@ public class AuthenticationManager {
         AuthenticationSettings.INSTANCE.setSkipBroker(true);
     }
 
-    public static synchronized AuthenticationManager getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new AuthenticationManager();
-        }
-        return INSTANCE;
-    }
-
-    public static synchronized void resetInstance() {
-        INSTANCE = null;
-    }
-
-    private static AuthenticationManager INSTANCE;
-
-    private AuthenticationManager() {
-        mResourceId = Constants.DISCOVERY_RESOURCE_ID;
-    }
-
-    /**
-     * Set the context activity before connecting to the currently active activity.
-     * @param contextActivity Currently active activity which can be utilized for interactive
-     *                        prompt.
-     */
-    public void setContextActivity(final Activity contextActivity) {
-        this.mContextActivity = contextActivity;
-    }
-
-    /**
-     * Change from the default Resource ID set in ServiceConstants to a different
-     * resource ID.
-     * This can be called at anytime without requiring another interactive prompt.
-     * @param resourceId URL of resource ID to be accessed on behalf of user.
-     */
-    public void setResourceId(final String resourceId) {
-        this.mResourceId = resourceId;
-        this.mDependencyResolver.setResourceId(resourceId);
-    }
-
-    /**
-     * Turn logging on.
-     * @param level LogLevel to set.
-     */
-    public void enableLogging(LogLevel level) {
-        this.mDependencyResolver.getLogger().setEnabled(true);
-        this.mDependencyResolver.getLogger().setLogLevel(level);
-    }
-
-    /**
-     * Turn logging off.
-     */
-    public void disableLogging() {
-        this.mDependencyResolver.getLogger().setEnabled(false);
-    }
-
     /**
      * Calls {@link AuthenticationManager#authenticatePrompt(AuthenticationCallback)} if no user id is stored in the shared preferences.
      * Calls {@link AuthenticationManager#authenticateSilent(AuthenticationCallback)} otherwise.
      * @param authenticationCallback The callback to notify when the processing is finished.
      */
     public void connect(final AuthenticationCallback<AuthenticationResult> authenticationCallback) {
-        if (verifyAuthenticationContext()) {
-            if(isConnected()) {
-                authenticateSilent(authenticationCallback);
-            } else {
-                authenticatePrompt(authenticationCallback);
+        // Since we're doing considerable work, let's get out of the main thread
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (verifyAuthenticationContext()) {
+                    if (isConnected()) {
+                        authenticateSilent(authenticationCallback);
+                    } else {
+                        authenticatePrompt(authenticationCallback);
+                    }
+                } else {
+                    Log.e(TAG, "connect - Auth context verification failed. Did you set a context activity?");
+                    throw new AuthenticationException(
+                            ADALError.ACTIVITY_REQUEST_INTENT_DATA_IS_NULL,
+                            "Auth context verification failed. Did you set a context activity?");
+                }
             }
-        } else {
-            Log.e(TAG, "connect - Auth context verification failed. Did you set a context activity?");
-            throw new AuthenticationException(
-                    ADALError.ACTIVITY_REQUEST_INTENT_DATA_IS_NULL,
-                    "Auth context verification failed. Did you set a context activity?");
-        }
+        }).start();
     }
 
     /**
@@ -236,6 +169,60 @@ public class AuthenticationManager {
     }
 
     /**
+     * Disconnects the app from Office 365 by clearing the token cache, setting the client objects
+     * to null, and removing the user id from shred preferences.
+     */
+    public void disconnect(){
+        // Clear tokens.
+        if(getAuthenticationContext().getCache() != null) {
+            getAuthenticationContext().getCache().removeAll();
+        }
+
+        // Reset the AuthenticationManager object
+        AuthenticationManager.resetInstance();
+
+        // Forget the user
+        removeUserId();
+    }
+
+    public static synchronized AuthenticationManager getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new AuthenticationManager();
+        }
+        return INSTANCE;
+    }
+
+    private static synchronized void resetInstance() {
+        INSTANCE = null;
+    }
+
+    private static AuthenticationManager INSTANCE;
+
+    private AuthenticationManager() {
+        mResourceId = Constants.DISCOVERY_RESOURCE_ID;
+    }
+
+    /**
+     * Set the context activity before connecting to the currently active activity.
+     * @param contextActivity Currently active activity which can be utilized for interactive
+     *                        prompt.
+     */
+    public void setContextActivity(final Activity contextActivity) {
+        this.mContextActivity = contextActivity;
+    }
+
+    /**
+     * Change from the default Resource ID set in ServiceConstants to a different
+     * resource ID.
+     * This can be called at anytime without requiring another interactive prompt.
+     * @param resourceId URL of resource ID to be accessed on behalf of user.
+     */
+    public void setResourceId(final String resourceId) {
+        this.mResourceId = resourceId;
+        this.mDependencyResolver.setResourceId(resourceId);
+    }
+
+    /**
      * Gets authentication context for Azure Active Directory.
      * @return an authentication context, if successful.
      */
@@ -252,29 +239,12 @@ public class AuthenticationManager {
 
     /**
      * Dependency resolver that can be used to create client objects.
-     * The {@link DiscoveryController#getServiceInfo} method uses it to create a DiscoveryClient object.
-     * The {@link MailController#sendMail(String, String, String)} uses it to create an OutlookClient object.
+     * The {@link DiscoveryManager#getServiceInfo} method uses it to create a DiscoveryClient object.
+     * The {@link MailManager#sendMail(String, String, String, OperationCallback)} uses it to create an OutlookClient object.
      * @return The dependency resolver object.
      */
     public DependencyResolver getDependencyResolver() {
         return getInstance().mDependencyResolver;
-    }
-
-    /**
-     * Disconnects the app from Office 365 by clearing the token cache, setting the client objects
-     * to null, and removing the user id from shred preferences.
-     */
-    public void disconnect(){
-        // Clear tokens.
-        if(getAuthenticationContext().getCache() != null) {
-            getAuthenticationContext().getCache().removeAll();
-        }
-
-        // Reset the AuthenticationManager object
-        AuthenticationManager.resetInstance();
-
-        // Forget the user
-        removeUserId();
     }
 
     private boolean verifyAuthenticationContext() {
@@ -319,5 +289,47 @@ public class AuthenticationManager {
         SharedPreferences.Editor editor = settings.edit();
         editor.remove(USER_ID_VAR_NAME);
         editor.apply();
+    }
+
+    /**
+     * Generates an encryption key for devices with API level lower than 18 using the
+     * ANDROID_ID value as a seed.
+     * In production scenarios, you should come up with your own implementation of this method.
+     * Consider that your algorithm must return the same key so it can encrypt/decrypt values
+     * successfully.
+     * @return The encryption key in a 32 byte long array.
+     */
+    private static byte[] generateSecretKey() {
+        byte[] key = new byte[32];
+        byte[] android_id;
+
+        try{
+            android_id = Settings.Secure.ANDROID_ID.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e){
+            Log.e(TAG, "generateSecretKey - " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+
+        for(int i = 0; i < key.length; i++){
+            key[i] = android_id[i % android_id.length];
+        }
+
+        return key;
+    }
+
+    /**
+     * Turn logging on.
+     * @param level LogLevel to set.
+     */
+    public void enableLogging(LogLevel level) {
+        this.mDependencyResolver.getLogger().setEnabled(true);
+        this.mDependencyResolver.getLogger().setLogLevel(level);
+    }
+
+    /**
+     * Turn logging off.
+     */
+    public void disableLogging() {
+        this.mDependencyResolver.getLogger().setEnabled(false);
     }
 }

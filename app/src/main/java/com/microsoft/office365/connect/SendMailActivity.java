@@ -1,5 +1,6 @@
 /*
- *  Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See full license at the bottom of this file.
+ * Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
+ * See LICENSE in the project root for license information.
  */
 package com.microsoft.office365.connect;
 
@@ -10,25 +11,21 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.SettableFuture;
-import com.microsoft.discoveryservices.ServiceInfo;
+import com.microsoft.services.discovery.ServiceInfo;
 
 import java.text.MessageFormat;
-import java.util.concurrent.ExecutionException;
 
 /**
  * This activity handles the send mail operation of the app.
  * The app must be connected to Office 365 before this activity can send an email.
- * The activity uses the DiscoveryController class to get the service endpoint. It also
- * uses the MailController to send the message.
+ * The activity uses the DiscoveryManager class to get the service endpoint. It also
+ * uses the MailManager to send the message.
  */
 public class SendMailActivity extends AppCompatActivity {
 
@@ -37,7 +34,7 @@ public class SendMailActivity extends AppCompatActivity {
     private TextView mTitleTextView;
     private TextView mDescriptionTextView;
     private EditText mEmailEditText;
-    private ImageButton mSendMailButton;
+    private Button mSendMailButton;
     private ProgressBar mSendMailProgressBar;
     private TextView mConclusionTextView;
 
@@ -53,67 +50,84 @@ public class SendMailActivity extends AppCompatActivity {
                 .getStringExtra("givenName") + "!");
         mEmailEditText.setText(getIntent()
                 .getStringExtra("displayableId"));
+
+        // We don't need to wait for user input to discover the mail service,
+        // so we just do it
+        discoverMailService();
     }
 
     /**
-     * Handler for the onclick event of the send mail button. It locates the service endpoints
-     * for the mail service using the DiscoveryController class. It also uses the MailController
+     * Locates the service endpoints for the mail service using the DiscoveryManager class.
+     */
+    public void discoverMailService(){
+        resetUIForDiscoverMailService();
+
+        // DiscoveryManager does its job in a worker thread
+        // we can just call getServiceInfo
+        DiscoveryManager
+                .getInstance()
+                .getServiceInfo(Constants.MAIL_CAPABILITY,
+                        new OperationCallback<ServiceInfo>() {
+                            @Override
+                            public void onSuccess(final ServiceInfo serviceInfo) {
+                                Log.i(TAG, "discoverMailService - Mail service discovered");
+
+                                // Initialize MailManager with ResourceID and ServiceEndpointURI
+                                MailManager
+                                        .getInstance()
+                                        .setServiceResourceId(
+                                                serviceInfo.getServiceResourceId()
+                                        );
+                                MailManager
+                                        .getInstance()
+                                        .setServiceEndpointUri(
+                                                serviceInfo.getServiceEndpointUri()
+                                        );
+
+                                showDiscoverSuccessUI();
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                Log.e(TAG, "discoverMailService - " + e.getMessage());
+                                showDiscoverErrorUI();
+                            }
+                        }
+                );
+    }
+
+    /**
+     * Handler for the onclick event of the send mail button. It uses the MailManager
      * class to send an email to the address stored in the mEmailEditText view.
      * The subject and body of the message is stored in the strings.xml file.
-     * @param v
+     * @param v The view that sent the event.
      */
     public void onSendMailButtonClick(View v){
-        final SettableFuture<ServiceInfo> serviceDiscovered;
-
         resetUIForSendMail();
 
-        serviceDiscovered = DiscoveryController
-                .getInstance()
-                .getServiceInfo(Constants.MAIL_CAPABILITY);
-
-        Futures.addCallback(serviceDiscovered,
-                new FutureCallback<ServiceInfo>() {
+        // MailManager does its job in a worker thread
+        // we can just call sendMail
+        MailManager.getInstance().sendMail(
+                mEmailEditText.getText().toString(),
+                getResources().getString(R.string.mail_subject_text),
+                MessageFormat.format(
+                        getResources().getString(R.string.mail_body_text),
+                        getIntent().getStringExtra("givenName")
+                ),
+                new OperationCallback<Integer>() {
                     @Override
-                    public void onSuccess(ServiceInfo serviceInfo) {
-                        Log.i(TAG, "onSendMailButtonClick - Mail service discovered");
-                        showDiscoverSuccessUI();
-
-                        MailController
-                                .getInstance()
-                                .setServiceResourceId(
-                                        serviceInfo.getserviceResourceId()
-                                );
-                        MailController
-                                .getInstance()
-                                .setServiceEndpointUri(
-                                        serviceInfo.getserviceEndpointUri()
-                                );
-
-                        try {
-                            // Since we are no longer on the UI thread,
-                            // we can call this method synchronously without blocking the UI
-                            Boolean mailSent = MailController.getInstance().sendMail(
-                                    mEmailEditText.getText().toString(),
-                                    getResources().getString(R.string.mail_subject_text),
-                                    MessageFormat.format(
-                                            getResources().getString(R.string.mail_body_text),
-                                            getIntent().getStringExtra("givenName")
-                                    )
-                            ).get();
-                            Log.i(TAG, "sendMailToRecipient - Mail sent");
-                            showSendMailSuccessUI();
-                        } catch (InterruptedException | ExecutionException e) {
-                            Log.e(TAG, "onSendMailButtonClick - " + e.getMessage());
-                            showSendMailErrorUI();
-                        }
+                    public void onSuccess(Integer result) {
+                        Log.i(TAG, "onSendMailButtonClick - Mail sent");
+                        showSendMailSuccessUI();
                     }
 
                     @Override
-                    public void onFailure(final Throwable t) {
-                        Log.e(TAG, "onSendMailButtonClick - " + t.getMessage());
-                        showDiscoverErrorUI();
+                    public void onError(Exception e) {
+                        Log.e(TAG, "onSendMailButtonClick - " + e.getMessage());
+                        showSendMailErrorUI();
                     }
-                });
+                }
+        );
     }
 
     @Override
@@ -127,7 +141,7 @@ public class SendMailActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         try {
             switch (item.getItemId()) {
-                case R.id.disconnectMenuitem:
+                case R.id.disconnectMenuItem:
                     AuthenticationManager.getInstance().disconnect();
                     showDisconnectSuccessUI();
                     Intent connectIntent = new Intent(this, ConnectActivity.class);
@@ -150,9 +164,15 @@ public class SendMailActivity extends AppCompatActivity {
         mTitleTextView = (TextView)findViewById(R.id.titleTextView);
         mDescriptionTextView = (TextView)findViewById(R.id.descriptionTextView);
         mEmailEditText = (EditText)findViewById(R.id.emailEditText);
-        mSendMailButton = (ImageButton)findViewById(R.id.sendMailButton);
+        mSendMailButton = (Button)findViewById(R.id.sendMailButton);
         mSendMailProgressBar = (ProgressBar)findViewById(R.id.sendMailProgressBar);
         mConclusionTextView = (TextView)findViewById(R.id.conclusionTextView);
+    }
+
+    private void resetUIForDiscoverMailService(){
+        mSendMailButton.setVisibility(View.GONE);
+        mConclusionTextView.setVisibility(View.GONE);
+        mSendMailProgressBar.setVisibility(View.VISIBLE);
     }
 
     private void resetUIForSendMail(){
@@ -164,26 +184,14 @@ public class SendMailActivity extends AppCompatActivity {
     private void showDiscoverSuccessUI(){
         runOnUiThread(new Runnable() {
             @Override
-            public void run(){
+            public void run() {
+                // Now that we have discovered the mail service, show the send mail button
+                mSendMailButton.setVisibility(View.VISIBLE);
+                mSendMailProgressBar.setVisibility(View.GONE);
+
                 Toast.makeText(
                         SendMailActivity.this,
                         R.string.discover_toast_text,
-                        Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void showSendMailSuccessUI(){
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run(){
-                mSendMailProgressBar.setVisibility(View.GONE);
-                mSendMailButton.setVisibility(View.VISIBLE);
-                mConclusionTextView.setText(R.string.conclusion_text);
-                mConclusionTextView.setVisibility(View.VISIBLE);
-                Toast.makeText(
-                        SendMailActivity.this,
-                        R.string.send_mail_toast_text,
                         Toast.LENGTH_SHORT).show();
             }
         });
@@ -205,13 +213,29 @@ public class SendMailActivity extends AppCompatActivity {
         });
     }
 
+    private void showSendMailSuccessUI(){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run(){
+                mSendMailProgressBar.setVisibility(View.GONE);
+                mSendMailButton.setVisibility(View.VISIBLE);
+                mConclusionTextView.setText(R.string.conclusion_text);
+                mConclusionTextView.setVisibility(View.VISIBLE);
+                Toast.makeText(
+                        SendMailActivity.this,
+                        R.string.send_mail_toast_text,
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private void showSendMailErrorUI(){
         runOnUiThread(new Runnable() {
             @Override
             public void run(){
                 mSendMailProgressBar.setVisibility(View.GONE);
                 mSendMailButton.setVisibility(View.VISIBLE);
-                mConclusionTextView.setText(R.string.sendmail_text_error);
+                mConclusionTextView.setText(R.string.send_mail_text_error);
                 mConclusionTextView.setVisibility(View.VISIBLE);
                 Toast.makeText(
                         SendMailActivity.this,
@@ -234,32 +258,3 @@ public class SendMailActivity extends AppCompatActivity {
                 Toast.LENGTH_SHORT).show();
     }
 }
-
-// *********************************************************
-//
-// O365-Android-Connect, https://github.com/OfficeDev/O365-Android-Connect
-//
-// Copyright (c) Microsoft Corporation
-// All rights reserved.
-//
-// MIT License:
-// Permission is hereby granted, free of charge, to any person obtaining
-// a copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to
-// permit persons to whom the Software is furnished to do so, subject to
-// the following conditions:
-//
-// The above copyright notice and this permission notice shall be
-// included in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
-// *********************************************************
