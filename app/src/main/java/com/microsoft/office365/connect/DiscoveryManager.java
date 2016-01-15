@@ -89,7 +89,7 @@ public class DiscoveryManager {
             List<ServiceInfo> services =
                     discoveryClient
                             .getServices()
-                            .select("serviceResourceId,serviceEndpointUri,capability")
+                            .select("serviceResourceId,serviceEndpointUri,serviceName,capability")
                             .read().get();
 
             Log.i(TAG, "getServiceInfoFromDiscoveryService - Services discovered\n");
