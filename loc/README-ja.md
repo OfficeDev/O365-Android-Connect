@@ -29,7 +29,7 @@ Android 用 Office 365 Connect のサンプルを使用するには以下が必�
 
      > 重要事項：Azure サブスクリプションが Office 365 テナントにバインドされていることを確認する必要があります。確認するには、Active Directory チームのブログ投稿「[複数の Windows Azure Active Directory を作成および管理する](http://blogs.technet.com/b/ad/archive/2013/11/08/creating-and-managing-multiple-windows-azure-active-directories.aspx)」を参照してください。「**新しいディレクトリを追加する**」セクションで、この方法について説明しています。また、詳細については、「[Office 365 開発環境をセットアップする](https://msdn.microsoft.com/office/office365/howto/setup-development-environment#bk_CreateAzureSubscription)」や「**Office 365 アカウントを Azure AD と関連付けてアプリを作成および管理する**」セクションも参照してください。
       
-* Azure に登録されたアプリケーションのクライアント ID とリダイレクト URI の値。アプリケーションには、**[ユーザーとしてメールを送信する]** アクセス許可を付与する必要があります。[Azure にネイティブ クライアント アプリケーションを追加](https://msdn.microsoft.com/library/azure/dn132599.aspx#BKMK_Adding)し、[適切なアクセス許可を付与](https://github.com/OfficeDev/O365-Android-Connect/wiki/Grant-permissions-to-the-Connect-application-in-Azure)します。
+* Azure に登録されたアプリケーションのクライアント ID とリダイレクト URI の値。アプリケーションには、**[ユーザーとしてメールを送信する]** アクセス許可を付与する必要があります。[Azure にネイティブ クライアント アプリケーションを追加](https://msdn.microsoft.com/office/office365/HowTo/add-common-consent-manually#bk_RegisterNativeApp)し、[適切なアクセス許可を付与](https://github.com/OfficeDev/O365-Android-Connect/wiki/Grant-permissions-to-the-Connect-application-in-Azure)します。
 
 ## Android Studio を使用してサンプルを開く
 
