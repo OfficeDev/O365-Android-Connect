@@ -3,7 +3,7 @@
 
 [日本 (日本語)](/loc/README-ja.md) (日本語)
 
-[![Office 365 Connect のサンプル](../readme-images/O365-Android-Connect-video_play_icon.png)](https://www.youtube.com/watch?v=3IQIDFrqhY4 "稼働中のサンプルを確認するにはこちらをクリックしてください")
+[![Office 365 Connect のサンプル](/readme-images/O365-Android-Connect-video_play_icon.png)](https://www.youtube.com/watch?v=3IQIDFrqhY4 "稼働中のサンプルを確認するにはこちらをクリックしてください")
 
 Office 365 への接続は、各 Android アプリが Office 365 のサービスおよびデータの操作を開始するために必要な最初の手順です。このサンプルは、1 つの API に接続してから呼び出す方法を示しています。
 
@@ -45,7 +45,7 @@ Android 用 Office 365 Connect のサンプルを使用するには以下が必�
 4. [```Constants.java```](app/src/main/java/com/microsoft/office365/connect/Constants.java) ファイルを開きます。
 	1. [```CLIENT_ID```](app/src/main/java/com/microsoft/office365/connect/Constants.java#L12) 定数を検索して、その String 値を Azure Active Directory に登録されているクライアント ID と同じ値に設定します。
 	2. [```REDIRECT_URI```](/app/src/main/java/com/microsoft/office365/connect/Constants.java#L13) 定数を検索して、その String 値を Azure Active Directory に登録されているリダイレクト URI と同じ値に設定します。
-    ![Office 365 Connect sample](../readme-images/O365-Android-Connect-Constants.png "Client ID and Redirect URI values in Constants file")
+    ![Office 365 Connect sample](/readme-images/O365-Android-Connect-Constants.png "Client ID and Redirect URI values in Constants file")
 
     > 注:CLIENT\_ID と REDIRECT\_URI の値がない場合は、[ネイティブ クライアント アプリケーションを Azure に追加](https://msdn.microsoft.com/library/azure/dn132599.aspx#BKMK_Adding)し、CLIENT\_ID と REDIRECT_URI を書き留めます。
 
