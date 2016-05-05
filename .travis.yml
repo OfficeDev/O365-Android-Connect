@@ -14,6 +14,6 @@ notifications:
     secure: JIndOGoBOL+4P1Rmty0GZ2M655HuZTwnWQJA6swCm+h4D4LVQIRqo4kgCdmteMZLVOPraIStFw6A0piKmhiwfA3SP+resO2rCoQQfJkLEfq5aJWph1bUEaoG+LMZwfS5pwHf5TSXk6WpwQ4imxYNiT3hiCA4us1rE6R4SpphupY=
   email:
     recipients:
-    - jak@microsoft.com
+    - ricardol@microsoft.com
     on_success: never
     on_failure: always
