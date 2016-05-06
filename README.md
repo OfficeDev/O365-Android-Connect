@@ -1,5 +1,5 @@
 # Office 365 Connect Sample for Android
-[![Build Status](https://travis-ci.org/OfficeDev/O365-Android-Connect.svg)](https://travis-ci.org/OfficeDev/O365-Android-Connect)
+[![Build Status](https://travis-ci.org/OfficeDev/O365-Android-Connect.svg?branch=master)](https://travis-ci.org/OfficeDev/O365-Android-Connect)
 
 [日本 (日本語)](/loc/README-ja.md) (Japanese)
 
