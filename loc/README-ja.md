@@ -1,5 +1,5 @@
 # Android 用 Office 365 Connect のサンプル
-[![ビルドの状況](https://travis-ci.org/OfficeDev/O365-Android-Connect.svg)](https://travis-ci.org/OfficeDev/O365-Android-Connect)
+[![Build Status](https://travis-ci.org/OfficeDev/O365-Android-Connect.svg?branch=master)](https://travis-ci.org/OfficeDev/O365-Android-Connect)
 
 [日本 (日本語)](/loc/README-ja.md) (日本語)
 
@@ -20,7 +20,7 @@ Android 用 Office 365 Connect のサンプルを使用するには以下が必�
 
 * [Android Studio](http://developer.android.com/sdk/index.html) バージョン 1.0 以上。
 * [Java 開発キット (JDK) 7](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html)。
-* Office 365 アカウント。[Office 365 Developer](https://portal.office.com/Signup/Signup.aspx?OfferId=6881A1CB-F4EB-4db3-9F18-388898DAF510&DL=DEVELOPERPACK&ali=1#0) サブスクリプションにサイン アップすることができます。ここには、Office 365 アプリのビルドを開始するために必要なリソースが含まれています。
+* Office 365 アカウント。 [Office 365 開発者プログラムに参加し、Office 365 の 1 年間の無料サブスクリプションを取得](https://profile.microsoft.com/RegSysProfileCenter/wizardnp.aspx?wizid=14b845d0-938c-45af-b061-f798fbb4d170&amp;lcid=1033)しましょう。それには Office 365 アプリの構築を開始するために必要なリソースも含まれています。
 
      > 注:サブスクリプションが既に存在する場合、上記のリンクをクリックすると、*申し訳ありません、現在のアカウントに追加できません* と表示されたページに移動します。その場合は、現在使用している Office 365 サブスクリプションのアカウントをご利用いただけます。
      Office 365 にすでにサインインしている場合、上記のリンクの [サインイン] ボタンに、*申し訳ございません。お客様のリクエストを処理できません。* というメッセージが表示されます。その場合、その同じページで Office 365 からサインアウトし、その後もう一度サインインしてください。
@@ -47,7 +47,7 @@ Android 用 Office 365 Connect のサンプルを使用するには以下が必�
 	2. [```REDIRECT_URI```](/app/src/main/java/com/microsoft/office365/connect/Constants.java#L13) 定数を検索して、その String 値を Azure Active Directory に登録されているリダイレクト URI と同じ値に設定します。
     ![Office 365 Connect sample](/readme-images/O365-Android-Connect-Constants.png "Client ID and Redirect URI values in Constants file")
 
-    > 注:CLIENT\_ID と REDIRECT\_URI の値がない場合は、[ネイティブ クライアント アプリケーションを Azure に追加](https://msdn.microsoft.com/library/azure/dn132599.aspx#BKMK_Adding)し、CLIENT\_ID と REDIRECT_URI を書き留めます。
+    > 注:CLIENT\_ID と REDIRECT\_URI の値がない場合は、[ネイティブ クライアント アプリケーションを Azure に追加](https://msdn.microsoft.com/ja-jp/library/azure/dn132599.aspx#BKMK_Adding)し、CLIENT\_ID と REDIRECT_URI を書き留めます。
 
 Connect のサンプルをビルドしたら、エミュレーターまたはデバイス上で実行できます。**[デバイスの選択]** ダイアログから API レベル 15 以上のデバイスを選択してください。
 
