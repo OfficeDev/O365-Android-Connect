@@ -20,7 +20,7 @@ Android 用 Office 365 Connect のサンプルを使用するには以下が必�
 
 * [Android Studio](http://developer.android.com/sdk/index.html) バージョン 1.0 以上。
 * [Java 開発キット (JDK) 7](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html)。
-* Office 365 アカウント。 [Office 365 開発者プログラムに参加し、Office 365 の 1 年間の無料サブスクリプションを取得](https://profile.microsoft.com/RegSysProfileCenter/wizardnp.aspx?wizid=14b845d0-938c-45af-b061-f798fbb4d170&amp;lcid=1033)しましょう。それには Office 365 アプリの構築を開始するために必要なリソースも含まれています。
+* Office 365 アカウント。 [Office 365 開発者プログラムに参加し、Office 365 の 1 年間の無料サブスクリプションを取得](https://aka.ms/devprogramsignup)しましょう。それには Office 365 アプリの構築を開始するために必要なリソースも含まれています。
 
      > 注:サブスクリプションが既に存在する場合、上記のリンクをクリックすると、*申し訳ありません、現在のアカウントに追加できません* と表示されたページに移動します。その場合は、現在使用している Office 365 サブスクリプションのアカウントをご利用いただけます。
      Office 365 にすでにサインインしている場合、上記のリンクの [サインイン] ボタンに、*申し訳ございません。お客様のリクエストを処理できません。* というメッセージが表示されます。その場合、その同じページで Office 365 からサインアウトし、その後もう一度サインインしてください。
